@@ -1,0 +1,14 @@
+{
+  "version": "1.1.0",
+  "organization": "Kadajett",
+  "date": "2025",
+  "abstract": "A comprehensive set of 40 best practices for building production-ready NestJS applications. Rules are organized into 10 categories — Architecture, Dependency Injection, Error Handling, Security, Performance, Testing, Database & ORM, API Design, Microservices, and DevOps — prioritized by impact to guide automated code generation, review, and refactoring.",
+  "references": [
+    "[NestJS Documentation](https://docs.nestjs.com)",
+    "[NestJS Security](https://docs.nestjs.com/security/helmet)",
+    "[NestJS Testing](https://docs.nestjs.com/fundamentals/testing)",
+    "[NestJS Microservices](https://docs.nestjs.com/microservices/basics)",
+    "[TypeORM Documentation](https://typeorm.io)",
+    "[Prisma Documentation](https://www.prisma.io/docs)"
+  ]
+}
