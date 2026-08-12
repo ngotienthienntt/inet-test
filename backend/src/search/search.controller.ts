@@ -1,14 +1,17 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Get, Inject, Query } from '@nestjs/common';
 import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
-import { SearchService } from './search.service';
 import { SearchQueryDto } from './dto/search-query.dto';
+import type { ISearchService } from './search.interface';
+import { SEARCH_SERVICE } from './search.interface';
 
 @ApiTags('Search')
 @Throttle({ short: { ttl: 1000, limit: 10 }, medium: { ttl: 60000, limit: 200 } })
 @Controller('search')
 export class SearchController {
-  constructor(private readonly searchService: SearchService) {}
+  constructor(
+    @Inject(SEARCH_SERVICE) private readonly searchService: ISearchService,
+  ) {}
 
   @Get()
   @ApiOperation({ summary: 'Search products', description: 'Full-text search with filters, sorting and pagination' })
