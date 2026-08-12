@@ -2,7 +2,7 @@ import { Inject, Injectable, Logger } from '@nestjs/common';
 import { Client } from '@elastic/elasticsearch';
 import type { Sort } from '@elastic/elasticsearch/lib/api/types';
 import { SearchQueryDto } from './dto/search-query.dto';
-import { ProductDocument } from './search-index.service';
+import { ProductDocument } from './product-document.mapper';
 import { ELASTICSEARCH_CLIENT } from '../elasticsearch/elasticsearch.module';
 import { PaginatedResult } from '../common/types/index';
 

@@ -2,29 +2,9 @@ import { Inject, Injectable, Logger } from '@nestjs/common';
 import { Client } from '@elastic/elasticsearch';
 import { Product } from '../products/entities/product.entity';
 import { ELASTICSEARCH_CLIENT } from '../elasticsearch/elasticsearch.module';
+import { toProductDocument } from './product-document.mapper';
 
 const INDEX = 'products';
-
-export interface ProductDocument {
-  id: number;
-  name: string;
-  description: string;
-  category: string;
-  categorySlug: string;
-  badge: string;
-  isActive: boolean;
-  images: string[];
-  minPrice: number;
-  maxPrice: number;
-  variants: {
-    size: string;
-    colorName: string;
-    price: number;
-    originalPrice: number;
-    stock: number;
-  }[];
-  createdAt: string;
-}
 
 @Injectable()
 export class SearchIndexService {
@@ -34,33 +14,6 @@ export class SearchIndexService {
     @Inject(ELASTICSEARCH_CLIENT)
     private readonly esClient: Client,
   ) {}
-
-  private toDocument(product: Product): ProductDocument {
-    const prices = (product.variants ?? []).map((v) => Number(v.price));
-    const minPrice = prices.length ? Math.min(...prices) : 0;
-    const maxPrice = prices.length ? Math.max(...prices) : 0;
-
-    return {
-      id: product.id,
-      name: product.name,
-      description: product.description ?? '',
-      category: product.category?.name ?? '',
-      categorySlug: product.category?.slug ?? '',
-      badge: product.badge ?? '',
-      isActive: product.isActive,
-      images: (product.images ?? []).map((img) => img.url),
-      minPrice,
-      maxPrice,
-      variants: (product.variants ?? []).map((v) => ({
-        size: v.size ?? '',
-        colorName: v.colorName ?? '',
-        price: Number(v.price),
-        originalPrice: Number(v.originalPrice),
-        stock: v.stock,
-      })),
-      createdAt: product.createdAt ? product.createdAt.toISOString() : new Date().toISOString(),
-    };
-  }
 
   async ensureIndex(): Promise<void> {
     try {
@@ -116,7 +69,7 @@ export class SearchIndexService {
 
   async indexProduct(product: Product): Promise<void> {
     try {
-      const doc = this.toDocument(product);
+      const doc = toProductDocument(product);
       await this.esClient.index({
         index: INDEX,
         id: String(product.id),
@@ -146,7 +99,7 @@ export class SearchIndexService {
     try {
       const operations = products.flatMap((product) => [
         { index: { _index: INDEX, _id: String(product.id) } },
-        this.toDocument(product),
+        toProductDocument(product),
       ]);
 
       const result = await this.esClient.bulk({ operations, refresh: true });
