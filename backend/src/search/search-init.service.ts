@@ -1,4 +1,5 @@
 import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { SearchIndexService } from './search-index.service';
 import { ProductsService } from '../products/products.service';
 
@@ -9,9 +10,15 @@ export class SearchInitService implements OnApplicationBootstrap {
   constructor(
     private readonly searchIndexService: SearchIndexService,
     private readonly productsService: ProductsService,
+    private readonly config: ConfigService,
   ) {}
 
   async onApplicationBootstrap(): Promise<void> {
+    if (this.config.get<string>('SEARCH_PROVIDER') !== 'elasticsearch') {
+      this.logger.log('SEARCH_PROVIDER is not "elasticsearch" — skipping ES index bootstrap');
+      return;
+    }
+
     try {
       await this.searchIndexService.ensureIndex();
 
