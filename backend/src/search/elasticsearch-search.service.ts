@@ -5,12 +5,13 @@ import { SearchQueryDto } from './dto/search-query.dto';
 import { ProductDocument } from './product-document.mapper';
 import { ELASTICSEARCH_CLIENT } from '../elasticsearch/elasticsearch.module';
 import { PaginatedResult } from '../common/types/index';
+import { ISearchService } from './search.interface';
 
 const INDEX = 'products';
 
 @Injectable()
-export class SearchService {
-  private readonly logger = new Logger(SearchService.name);
+export class ElasticsearchSearchService implements ISearchService {
+  private readonly logger = new Logger(ElasticsearchSearchService.name);
 
   constructor(
     @Inject(ELASTICSEARCH_CLIENT)
