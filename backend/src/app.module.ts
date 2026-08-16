@@ -18,6 +18,7 @@ import { CartModule } from './cart/cart.module';
 import { OrdersModule } from './orders/orders.module';
 import { AdminModule } from './admin/admin.module';
 import { UploadModule } from './upload/upload.module';
+import { BannersModule } from './banners/banners.module';
 
 @Module({
   imports: [
@@ -65,6 +66,7 @@ import { UploadModule } from './upload/upload.module';
     OrdersModule,
     AdminModule,
     UploadModule,
+    BannersModule,
   ],
   controllers: [AppController],
   providers: [
