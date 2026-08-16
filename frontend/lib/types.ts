@@ -31,3 +31,14 @@ export interface ProductDetail extends Product {
   images: string[]
   variants: ProductVariant[]
 }
+
+export type BannerPosition = 'homepage_before_categories'
+
+export interface Banner {
+  id: number
+  position: BannerPosition
+  imageUrl: string
+  linkUrl: string | null
+  altText: string
+  isActive: boolean
+}
