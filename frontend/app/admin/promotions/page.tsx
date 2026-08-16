@@ -93,7 +93,7 @@ export default function AdminPromotionsPage() {
       const body = {
         position: form.position,
         imageUrl: form.imageUrl,
-        linkUrl: form.linkUrl || undefined,
+        linkUrl: form.linkUrl || null,
         altText: form.altText,
         isActive: form.isActive,
       }
@@ -201,7 +201,7 @@ export default function AdminPromotionsPage() {
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={banner.imageUrl} alt="" className="w-20 h-12 object-cover rounded-lg border border-gray-200" />
                   <div>
-                    <div className="font-medium text-gray-900">{POSITION_LABELS[banner.position]}</div>
+                    <div className="font-medium text-gray-900">{POSITION_LABELS[banner.position] ?? banner.position}</div>
                     <div className="text-xs text-gray-400 font-mono">{banner.linkUrl || '(không có link)'}</div>
                   </div>
                 </div>
@@ -211,7 +211,7 @@ export default function AdminPromotionsPage() {
                   </span>
                   <button onClick={() => openEdit(banner)} className="text-[#3762cc] hover:underline text-sm">Sửa</button>
                   <span className="text-gray-200">|</span>
-                  <button onClick={() => setConfirm({ id: banner.id, label: POSITION_LABELS[banner.position] })} className="text-red-500 hover:underline text-sm">Xóa</button>
+                  <button onClick={() => setConfirm({ id: banner.id, label: POSITION_LABELS[banner.position] ?? banner.position })} className="text-red-500 hover:underline text-sm">Xóa</button>
                 </div>
               </div>
             ))}

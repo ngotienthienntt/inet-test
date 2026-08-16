@@ -4,7 +4,7 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
-  IsUrl,
+  Matches,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { BannerPosition } from '../banner-position.enum';
@@ -21,7 +21,9 @@ export class CreateBannerDto {
 
   @ApiPropertyOptional({ example: '/shop?category=dien-thoai' })
   @IsOptional()
-  @IsUrl({ require_tld: false, require_protocol: false })
+  @Matches(/^(https?:\/\/|\/)\S*$/, {
+    message: 'linkUrl must be an absolute http(s) URL or a path starting with "/"',
+  })
   linkUrl?: string;
 
   @ApiProperty({ example: 'Banner khuyến mãi điện thoại' })

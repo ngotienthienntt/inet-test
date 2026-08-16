@@ -33,7 +33,8 @@ export class BannersService {
     if (!banner) {
       throw new NotFoundException(`Banner #${id} not found`);
     }
-    if (dto.isActive === true) {
+    const willBeActive = dto.isActive ?? banner.isActive;
+    if (willBeActive) {
       await this.deactivateSiblings(dto.position ?? banner.position);
     }
     Object.assign(banner, dto);

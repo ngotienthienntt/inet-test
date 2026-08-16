@@ -116,6 +116,24 @@ describe('BannersService', () => {
 
       expect(repo.update).not.toHaveBeenCalled();
     });
+
+    it('deactivates siblings when isActive is omitted entirely (defaults to active)', async () => {
+      const dto = {
+        position: BannerPosition.HOMEPAGE_BEFORE_CATEGORIES,
+        imageUrl: 'http://x/banner.jpg',
+        altText: 'Alt',
+      };
+      const created = mockBanner();
+      repo.create.mockReturnValue(created);
+      repo.save.mockResolvedValue(created);
+
+      await service.create(dto);
+
+      expect(repo.update).toHaveBeenCalledWith(
+        { position: BannerPosition.HOMEPAGE_BEFORE_CATEGORIES, isActive: true },
+        { isActive: false },
+      );
+    });
   });
 
   describe('update', () => {
@@ -134,6 +152,29 @@ describe('BannersService', () => {
 
       expect(repo.update).toHaveBeenCalledWith(
         { position: existing.position, isActive: true },
+        { isActive: false },
+      );
+    });
+
+    it('does not deactivate siblings when explicitly deactivating a banner', async () => {
+      const existing = mockBanner({ isActive: true });
+      repo.findOne.mockResolvedValue(existing);
+      repo.save.mockResolvedValue({ ...existing, isActive: false });
+
+      await service.update(1, { isActive: false });
+
+      expect(repo.update).not.toHaveBeenCalled();
+    });
+
+    it('deactivates siblings in the NEW position when changing position on an already-active banner', async () => {
+      const existing = mockBanner({ isActive: true });
+      repo.findOne.mockResolvedValue(existing);
+      repo.save.mockResolvedValue({ ...existing, position: 'some_other_position' });
+
+      await service.update(1, { position: 'some_other_position' as BannerPosition });
+
+      expect(repo.update).toHaveBeenCalledWith(
+        { position: 'some_other_position', isActive: true },
         { isActive: false },
       );
     });
