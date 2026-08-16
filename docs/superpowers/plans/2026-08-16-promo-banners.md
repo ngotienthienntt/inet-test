@@ -51,7 +51,7 @@
 - Create: `backend/src/migrations/1700000000007-CreateBannersTable.ts`
 
 **Interfaces:**
-- Produces: `BannerPosition` enum (`HOMEPAGE_BEFORE_CATEGORIES = 'homepage_before_categories'`), `Banner` entity class with fields `id: number`, `position: string`, `imageUrl: string`, `linkUrl: string | null`, `altText: string`, `isActive: boolean`, `createdAt: Date`, `updatedAt: Date`. Later tasks (service, DTOs) import both from these exact paths.
+- Produces: `BannerPosition` enum (`HOMEPAGE_BEFORE_CATEGORIES = 'homepage_before_categories'`), `Banner` entity class with fields `id: number`, `position: string`, `imageUrl: string`, `linkUrl: string` (nullable at the DB/column level, non-null in the TS type — see the post-Task-1 ruling note below), `altText: string`, `isActive: boolean`, `createdAt: Date`, `updatedAt: Date`. Later tasks (service, DTOs) import both from these exact paths.
 
 - [ ] **Step 1: Create the `BannerPosition` enum**
 
@@ -86,7 +86,7 @@ export class Banner {
   imageUrl: string;
 
   @Column({ name: 'link_url', nullable: true })
-  linkUrl: string | null;
+  linkUrl: string;
 
   @Column({ name: 'alt_text' })
   altText: string;
@@ -101,6 +101,8 @@ export class Banner {
   updatedAt: Date;
 }
 ```
+
+> **Note (post-Task-1 ruling):** `linkUrl` is typed `string`, not `string | null` — TypeORM 0.3.28 can't infer a column type from a union without an explicit `type:` option, and this matches the existing codebase convention (`Category.description`, `Product.description` are typed `string` while `nullable: true` at the column level). The DB column stays nullable; at runtime an unset `linkUrl` is still `null` on the hydrated entity and in the JSON response — only the backend's compile-time TS type is non-null. Task 3's test fixtures and Task 5's frontend `Banner` type below account for this.
 
 - [ ] **Step 3: Write the migration**
 
@@ -252,7 +254,7 @@ const mockBanner = (overrides: Partial<Banner> = {}): Banner =>
     id: 1,
     position: BannerPosition.HOMEPAGE_BEFORE_CATEGORIES,
     imageUrl: 'http://localhost:3001/uploads/products/banner.jpg',
-    linkUrl: null,
+    linkUrl: 'http://localhost:3000/shop?category=dien-thoai',
     altText: 'Banner khuyến mãi',
     isActive: true,
     createdAt: new Date(),
