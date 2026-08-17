@@ -83,7 +83,7 @@ function UserMenu() {
   )
 }
 
-export default function Header() {
+export default function Header({ storeName = 'ShopVN' }: { storeName?: string }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const { totalItems } = useCart()
   const { user, logout } = useAuth()
@@ -96,7 +96,7 @@ export default function Header() {
           <div className="flex items-center justify-between h-16 gap-4">
             {/* Logo */}
             <Link href="/" className="flex-shrink-0 text-2xl font-bold text-[#1c3b71] hover:text-[#3762cc] transition-colors">
-              ShopVN
+              {storeName}
             </Link>
 
             {/* Search bar — center */}

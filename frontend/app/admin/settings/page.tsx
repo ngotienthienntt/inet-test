@@ -4,8 +4,6 @@ import { adminFetch } from '@/lib/adminFetch'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api'
 
-const SETTINGS_KEY = 'shopvn_admin_settings'
-
 interface StoreSettings {
   storeName: string
   contactEmail: string
@@ -29,6 +27,8 @@ const DEFAULT_SETTINGS: StoreSettings = {
 export default function AdminSettingsPage() {
   const [settings, setSettings] = useState<StoreSettings>(DEFAULT_SETTINGS)
   const [settingsSaved, setSettingsSaved] = useState(false)
+  const [settingsError, setSettingsError] = useState('')
+  const [settingsSaving, setSettingsSaving] = useState(false)
 
   const [passwords, setPasswords] = useState({ current: '', newPass: '', confirm: '' })
   const [pwError, setPwError] = useState('')
@@ -36,17 +36,28 @@ export default function AdminSettingsPage() {
   const [pwSaving, setPwSaving] = useState(false)
 
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem(SETTINGS_KEY)
-      if (stored) setSettings(JSON.parse(stored))
-    } catch {}
+    adminFetch(`${API_URL}/settings`)
+      .then(r => r.json())
+      .then(data => setSettings(prev => ({ ...prev, ...data })))
+      .catch(() => {})
   }, [])
 
-  function handleSaveSettings(e: React.FormEvent) {
+  async function handleSaveSettings(e: React.FormEvent) {
     e.preventDefault()
-    localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings))
-    setSettingsSaved(true)
-    setTimeout(() => setSettingsSaved(false), 2000)
+    setSettingsError('')
+    setSettingsSaving(true)
+    try {
+      const res = await adminFetch(`${API_URL}/settings`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(settings),
+      })
+      const data = await res.json()
+      if (!res.ok) { setSettingsError(data.message || 'Lỗi lưu cài đặt'); return }
+      setSettings(prev => ({ ...prev, ...data }))
+      setSettingsSaved(true)
+      setTimeout(() => setSettingsSaved(false), 2000)
+    } catch { setSettingsError('Lỗi kết nối') } finally { setSettingsSaving(false) }
   }
 
   async function handleChangePassword(e: React.FormEvent) {
@@ -153,12 +164,15 @@ export default function AdminSettingsPage() {
           <p className="text-xs text-gray-400 mt-1">Đơn hàng trên ngưỡng này sẽ được miễn phí vận chuyển</p>
         </div>
 
+        {settingsError && <p className="text-sm text-red-600 bg-red-50 rounded-lg px-3 py-2">{settingsError}</p>}
+
         <div className="flex items-center gap-3 border-t border-gray-100 pt-4">
           <button
             type="submit"
-            className="px-6 py-2.5 bg-[#3762cc] text-white rounded-lg font-semibold text-sm hover:bg-[#2a4fa3] transition-colors"
+            disabled={settingsSaving}
+            className="px-6 py-2.5 bg-[#3762cc] text-white rounded-lg font-semibold text-sm hover:bg-[#2a4fa3] disabled:opacity-60 transition-colors"
           >
-            Lưu cài đặt
+            {settingsSaving ? 'Đang lưu...' : 'Lưu cài đặt'}
           </button>
           {settingsSaved && <span className="text-sm text-green-600 font-medium">Đã lưu!</span>}
         </div>
