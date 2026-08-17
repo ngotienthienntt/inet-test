@@ -38,9 +38,9 @@ export function SlidersHorizontalWrapper({
       </div>
 
       {sidebarOpen && (
-        <div className="fixed inset-0 z-40 lg:hidden">
+        <div className="fixed inset-0 z-[60] lg:hidden">
           <div className="absolute inset-0 bg-black/40" onClick={() => setSidebarOpen(false)} />
-          <div className="absolute left-0 top-0 bottom-0 w-72 bg-white overflow-y-auto z-50 shadow-xl">
+          <div className="absolute left-0 top-0 bottom-0 w-72 bg-white overflow-y-auto z-[60] shadow-xl">
             <div className="flex items-center justify-between p-4 border-b border-gray-100">
               <span className="font-semibold text-gray-800">Bộ lọc</span>
               <button
