@@ -18,11 +18,14 @@ function formatPrice(val: string) {
 function parsePrice(val: string) { return val.replace(/\D/g, '') }
 
 interface Category { id: number; name: string }
+interface Tag { id: number; name: string; slug: string }
 
 export default function EditProductPage() {
   const params = useParams<{ id: string }>()
   const router = useRouter()
   const [categories, setCategories] = useState<Category[]>([])
+  const [allTags, setAllTags] = useState<Tag[]>([])
+  const [tagIds, setTagIds] = useState<number[]>([])
   const [saving, setSaving] = useState(false)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -42,8 +45,11 @@ export default function EditProductPage() {
     Promise.all([
       fetch(`${API_URL}/products/id/${params.id}`, { headers: { Authorization: `Bearer ${token}` } }).then(r => r.json()),
       fetch(`${API_URL}/categories`, { headers: { Authorization: `Bearer ${token}` } }).then(r => r.json()),
-    ]).then(([product, cats]) => {
+      fetch(`${API_URL}/tags`, { headers: { Authorization: `Bearer ${token}` } }).then(r => r.json()),
+    ]).then(([product, cats, tags]) => {
       setCategories(Array.isArray(cats) ? cats : cats?.data ?? [])
+      setAllTags(Array.isArray(tags) ? tags : [])
+      setTagIds(Array.isArray(product.tags) ? product.tags.map((t: { id: number }) => t.id) : [])
       setSlug(product.slug || '')
 
       // Price lives on the first variant, fall back to top-level price
@@ -88,6 +94,10 @@ export default function EditProductPage() {
 
   function setField(key: string, value: string | boolean) {
     setForm(prev => ({ ...prev, [key]: value }))
+  }
+
+  function toggleTag(id: number) {
+    setTagIds(prev => prev.includes(id) ? prev.filter(t => t !== id) : [...prev, id])
   }
 
   async function handleUpload(files: FileList | null) {
@@ -137,6 +147,7 @@ export default function EditProductPage() {
           .filter(url => url.startsWith('http'))
           .map((url, i) => ({ url, sortOrder: i })),
         isActive: form.isActive,
+        tagIds,
         specs: specs.filter(s => s.label && s.value),
         variants: variants.filter(v => v.stock).map(v => {
           const price = Number(v.price || form.price)
@@ -318,6 +329,23 @@ export default function EditProductPage() {
             </div>
           ))}
           <button type="button" onClick={() => setSpecs(ss => [...ss, { label: '', value: '' }])} className="text-[#3762cc] text-sm hover:underline">+ Thêm thông số</button>
+        </div>
+
+        {/* Audience tags */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 space-y-3">
+          <h2 className="font-semibold text-gray-900">Đối tượng sử dụng</h2>
+          {allTags.length === 0 ? (
+            <p className="text-sm text-gray-400">Chưa có tag nào — tạo ở trang Đối tượng.</p>
+          ) : (
+            <div className="flex flex-wrap gap-2">
+              {allTags.map(t => (
+                <label key={t.id} className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm cursor-pointer border ${tagIds.includes(t.id) ? 'bg-blue-50 border-[#3762cc] text-[#3762cc] font-medium' : 'border-gray-200 text-gray-700 hover:bg-gray-50'}`}>
+                  <input type="checkbox" checked={tagIds.includes(t.id)} onChange={() => toggleTag(t.id)} className="accent-[#3762cc]" />
+                  {t.name}
+                </label>
+              ))}
+            </div>
+          )}
         </div>
 
         {error && <p className="text-sm text-red-600 bg-red-50 rounded-lg px-4 py-3">{error}</p>}

@@ -6,6 +6,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api'
 function getToken() { return typeof window !== 'undefined' ? localStorage.getItem('shopvn_token') || '' : '' }
 
 interface Category { id: number; name: string; slug: string }
+interface Tag { id: number; name: string; slug: string }
 
 function slugify(str: string) {
   return str.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9\s-]/g, '').trim().replace(/\s+/g, '-')
@@ -23,6 +24,8 @@ function parsePrice(val: string) {
 export default function NewProductPage() {
   const router = useRouter()
   const [categories, setCategories] = useState<Category[]>([])
+  const [allTags, setAllTags] = useState<Tag[]>([])
+  const [tagIds, setTagIds] = useState<number[]>([])
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
 
@@ -40,7 +43,15 @@ export default function NewProductPage() {
       .then(r => r.json())
       .then(data => setCategories(Array.isArray(data) ? data : data?.data ?? []))
       .catch(() => {})
+    fetch(`${API_URL}/tags`, { headers: { Authorization: `Bearer ${getToken()}` } })
+      .then(r => r.json())
+      .then(data => setAllTags(Array.isArray(data) ? data : []))
+      .catch(() => {})
   }, [])
+
+  function toggleTag(id: number) {
+    setTagIds(prev => prev.includes(id) ? prev.filter(t => t !== id) : [...prev, id])
+  }
 
   function setField(key: string, value: string | boolean) {
     setForm(prev => ({ ...prev, [key]: value }))
@@ -97,6 +108,7 @@ export default function NewProductPage() {
           .filter(url => url.startsWith('http'))
           .map((url, i) => ({ url, sortOrder: i })),
         isActive: form.isActive,
+        tagIds,
         specs: specs.filter(s => s.label && s.value),
         variants: variants.filter(v => v.stock).map(v => {
           const price = Number(v.price || form.price)
@@ -264,6 +276,23 @@ export default function NewProductPage() {
             </div>
           ))}
           <button type="button" onClick={() => setSpecs(ss => [...ss, { label: '', value: '' }])} className="text-[#3762cc] text-sm hover:underline">+ Thêm thông số</button>
+        </div>
+
+        {/* Audience tags */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 space-y-3">
+          <h2 className="font-semibold text-gray-900">Đối tượng sử dụng</h2>
+          {allTags.length === 0 ? (
+            <p className="text-sm text-gray-400">Chưa có tag nào — tạo ở trang Đối tượng.</p>
+          ) : (
+            <div className="flex flex-wrap gap-2">
+              {allTags.map(t => (
+                <label key={t.id} className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm cursor-pointer border ${tagIds.includes(t.id) ? 'bg-blue-50 border-[#3762cc] text-[#3762cc] font-medium' : 'border-gray-200 text-gray-700 hover:bg-gray-50'}`}>
+                  <input type="checkbox" checked={tagIds.includes(t.id)} onChange={() => toggleTag(t.id)} className="accent-[#3762cc]" />
+                  {t.name}
+                </label>
+              ))}
+            </div>
+          )}
         </div>
 
         {error && <p className="text-sm text-red-600 bg-red-50 rounded-lg px-4 py-3">{error}</p>}

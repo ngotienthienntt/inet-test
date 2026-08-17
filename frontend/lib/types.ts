@@ -42,3 +42,9 @@ export interface Banner {
   altText: string
   isActive: boolean
 }
+
+export interface Tag {
+  id: number
+  name: string
+  slug: string
+}
