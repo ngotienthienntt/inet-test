@@ -20,6 +20,7 @@ import { OrdersModule } from './orders/orders.module';
 import { AdminModule } from './admin/admin.module';
 import { UploadModule } from './upload/upload.module';
 import { BannersModule } from './banners/banners.module';
+import { SettingsModule } from './settings/settings.module';
 
 @Module({
   imports: [
@@ -69,6 +70,7 @@ import { BannersModule } from './banners/banners.module';
     AdminModule,
     UploadModule,
     BannersModule,
+    SettingsModule,
   ],
   controllers: [AppController],
   providers: [
