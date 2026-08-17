@@ -1,15 +1,15 @@
 import Link from 'next/link'
 
-export default function Footer() {
+export default function Footer({ storeName = 'ShopVN' }: { storeName?: string }) {
   return (
     <footer className="bg-[#232323] text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Company info */}
           <div>
-            <p className="text-2xl font-bold text-white mb-3">ShopVN</p>
+            <p className="text-2xl font-bold text-white mb-3">{storeName}</p>
             <p className="text-gray-400 text-sm leading-relaxed">
-              ShopVN — điểm mua sắm trực tuyến uy tín với hàng nghìn sản phẩm chính hãng,
+              {storeName} — điểm mua sắm trực tuyến uy tín với hàng nghìn sản phẩm chính hãng,
               giao hàng toàn quốc, đổi trả dễ dàng.
             </p>
           </div>
@@ -101,7 +101,7 @@ export default function Footer() {
         {/* Bottom bar */}
         <div className="border-t border-gray-700 mt-10 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
           <p className="text-gray-500 text-sm">
-            &copy; 2025 ShopVN. Tất cả quyền được bảo lưu.
+            &copy; 2025 {storeName}. Tất cả quyền được bảo lưu.
           </p>
           <div className="flex items-center gap-4">
             <Link href="/privacy" className="text-gray-500 text-xs hover:text-gray-300 transition-colors">

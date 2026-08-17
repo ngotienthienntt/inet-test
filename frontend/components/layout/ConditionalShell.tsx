@@ -15,7 +15,7 @@ export default function ConditionalShell({ children, storeName }: { children: Re
     <>
       <Header storeName={storeName} />
       <main className="flex-1">{children}</main>
-      <Footer />
+      <Footer storeName={storeName} />
     </>
   )
 }
