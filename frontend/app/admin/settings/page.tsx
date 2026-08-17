@@ -1,6 +1,8 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { adminFetch } from '@/lib/adminFetch'
+import { ToastContainer } from '@/components/ui/Toast'
+import { useToast } from '@/hooks/useToast'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api'
 
@@ -26,14 +28,14 @@ const DEFAULT_SETTINGS: StoreSettings = {
 
 export default function AdminSettingsPage() {
   const [settings, setSettings] = useState<StoreSettings>(DEFAULT_SETTINGS)
-  const [settingsSaved, setSettingsSaved] = useState(false)
   const [settingsError, setSettingsError] = useState('')
   const [settingsSaving, setSettingsSaving] = useState(false)
 
   const [passwords, setPasswords] = useState({ current: '', newPass: '', confirm: '' })
   const [pwError, setPwError] = useState('')
-  const [pwSuccess, setPwSuccess] = useState(false)
   const [pwSaving, setPwSaving] = useState(false)
+
+  const { toasts, toast, close } = useToast()
 
   useEffect(() => {
     adminFetch(`${API_URL}/settings`)
@@ -55,15 +57,13 @@ export default function AdminSettingsPage() {
       const data = await res.json()
       if (!res.ok) { setSettingsError(data.message || 'Lỗi lưu cài đặt'); return }
       setSettings(prev => ({ ...prev, ...data }))
-      setSettingsSaved(true)
-      setTimeout(() => setSettingsSaved(false), 2000)
+      toast('Đã lưu cài đặt', 'success')
     } catch { setSettingsError('Lỗi kết nối') } finally { setSettingsSaving(false) }
   }
 
   async function handleChangePassword(e: React.FormEvent) {
     e.preventDefault()
     setPwError('')
-    setPwSuccess(false)
     if (passwords.newPass !== passwords.confirm) { setPwError('Mật khẩu mới không khớp'); return }
     if (passwords.newPass.length < 8) { setPwError('Mật khẩu phải có ít nhất 8 ký tự'); return }
     setPwSaving(true)
@@ -74,7 +74,7 @@ export default function AdminSettingsPage() {
         body: JSON.stringify({ currentPassword: passwords.current, newPassword: passwords.newPass }),
       })
       if (res.ok) {
-        setPwSuccess(true)
+        toast('Mật khẩu đã được cập nhật thành công', 'success')
         setPasswords({ current: '', newPass: '', confirm: '' })
       } else {
         const data = await res.json()
@@ -174,7 +174,6 @@ export default function AdminSettingsPage() {
           >
             {settingsSaving ? 'Đang lưu...' : 'Lưu cài đặt'}
           </button>
-          {settingsSaved && <span className="text-sm text-green-600 font-medium">Đã lưu!</span>}
         </div>
       </form>
 
@@ -215,7 +214,6 @@ export default function AdminSettingsPage() {
         </div>
 
         {pwError && <p className="text-sm text-red-600 bg-red-50 rounded-lg px-3 py-2">{pwError}</p>}
-        {pwSuccess && <p className="text-sm text-green-600 bg-green-50 rounded-lg px-3 py-2">Mật khẩu đã được cập nhật thành công!</p>}
 
         <button
           type="submit"
@@ -225,6 +223,8 @@ export default function AdminSettingsPage() {
           {pwSaving ? 'Đang lưu...' : 'Cập nhật mật khẩu'}
         </button>
       </form>
+
+      <ToastContainer toasts={toasts} onClose={close} />
     </div>
   )
 }
