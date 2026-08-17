@@ -6,12 +6,13 @@ import { Product } from './entities/product.entity';
 import { ProductImage } from './entities/product-image.entity';
 import { ProductSpec } from './entities/product-spec.entity';
 import { Variant } from './entities/variant.entity';
+import { Tag } from '../tags/entities/tag.entity';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ProductQueryDto, ProductSortOption } from './dto/product-query.dto';
 import { PaginatedResult } from '../common/types/index';
 
-const PRODUCT_RELATIONS = ['category', 'images', 'specs', 'variants'];
+const PRODUCT_RELATIONS = ['category', 'images', 'specs', 'variants', 'tags'];
 
 @Injectable()
 export class ProductsService {
@@ -24,6 +25,8 @@ export class ProductsService {
     private readonly specRepo: Repository<ProductSpec>,
     @InjectRepository(Variant)
     private readonly variantRepo: Repository<Variant>,
+    @InjectRepository(Tag)
+    private readonly tagRepo: Repository<Tag>,
     private readonly eventEmitter: EventEmitter2,
   ) {}
 
@@ -52,6 +55,11 @@ export class ProductsService {
     if (query.category) {
       idQb.leftJoin('product.category', 'category')
         .andWhere('category.slug = :categorySlug', { categorySlug: query.category });
+    }
+
+    if (query.tag) {
+      idQb.leftJoin('product.tags', 'tag')
+        .andWhere('tag.slug = :tagSlug', { tagSlug: query.tag });
     }
 
     if (query.minPrice !== undefined) {
@@ -146,6 +154,7 @@ export class ProductsService {
       images: dto.images?.map((img) => this.imageRepo.create(img)) ?? [],
       specs: dto.specs?.map((spec) => this.specRepo.create(spec)) ?? [],
       variants: dto.variants?.map((v) => this.variantRepo.create(v)) ?? [],
+      tags: dto.tagIds ? await this.tagRepo.find({ where: { id: In(dto.tagIds) } }) : [],
     });
     const saved = await this.productRepo.save(product);
     const full = await this.findById(saved.id);
@@ -162,6 +171,10 @@ export class ProductsService {
     if (dto.description !== undefined) product.description = dto.description;
     if (dto.badge !== undefined) product.badge = dto.badge;
     if (dto.isActive !== undefined) product.isActive = dto.isActive;
+
+    if (dto.tagIds !== undefined) {
+      product.tags = await this.tagRepo.find({ where: { id: In(dto.tagIds) } });
+    }
 
     if (dto.images !== undefined) {
       await this.imageRepo.delete({ productId: id });

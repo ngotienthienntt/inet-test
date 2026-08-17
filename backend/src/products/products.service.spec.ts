@@ -8,6 +8,7 @@ import { Product } from './entities/product.entity';
 import { ProductImage } from './entities/product-image.entity';
 import { ProductSpec } from './entities/product-spec.entity';
 import { Variant } from './entities/variant.entity';
+import { Tag } from '../tags/entities/tag.entity';
 
 const mockProduct = (): Product =>
   ({
@@ -21,6 +22,7 @@ const mockProduct = (): Product =>
     images: [],
     specs: [],
     variants: [],
+    tags: [],
     createdAt: new Date(),
     updatedAt: new Date(),
   }) as Product;
@@ -40,6 +42,7 @@ describe('ProductsService', () => {
   let imageRepo: jest.Mocked<Repository<ProductImage>>;
   let specRepo: jest.Mocked<Repository<ProductSpec>>;
   let variantRepo: jest.Mocked<Repository<Variant>>;
+  let tagRepo: jest.Mocked<Repository<Tag>>;
   let eventEmitter: jest.Mocked<EventEmitter2>;
 
   beforeEach(async () => {
@@ -50,6 +53,7 @@ describe('ProductsService', () => {
         { provide: getRepositoryToken(ProductImage), useFactory: mockRepo },
         { provide: getRepositoryToken(ProductSpec), useFactory: mockRepo },
         { provide: getRepositoryToken(Variant), useFactory: mockRepo },
+        { provide: getRepositoryToken(Tag), useFactory: mockRepo },
         {
           provide: EventEmitter2,
           useValue: { emit: jest.fn() },
@@ -62,6 +66,7 @@ describe('ProductsService', () => {
     imageRepo = module.get(getRepositoryToken(ProductImage));
     specRepo = module.get(getRepositoryToken(ProductSpec));
     variantRepo = module.get(getRepositoryToken(Variant));
+    tagRepo = module.get(getRepositoryToken(Tag));
     eventEmitter = module.get(EventEmitter2);
   });
 
@@ -133,6 +138,69 @@ describe('ProductsService', () => {
       expect(productRepo.save).toHaveBeenCalled();
       expect(eventEmitter.emit).toHaveBeenCalledWith('product.created', product);
       expect(result).toEqual(product);
+    });
+
+    it('resolves tagIds into the tags relation via tagRepo.find', async () => {
+      const product = mockProduct();
+      const dto = { name: 'Test', slug: 'test', categoryId: 1, tagIds: [1, 2] };
+      const tags = [{ id: 1 }, { id: 2 }] as Tag[];
+
+      tagRepo.find.mockResolvedValue(tags);
+      productRepo.create.mockImplementation((p) => p as Product);
+      productRepo.save.mockResolvedValue(product);
+      productRepo.findOne.mockResolvedValue(product);
+
+      await service.create(dto);
+
+      expect(tagRepo.find).toHaveBeenCalledWith({ where: { id: expect.anything() } });
+      expect(productRepo.create).toHaveBeenCalledWith(expect.objectContaining({ tags }));
+    });
+  });
+
+  describe('update', () => {
+    it('resolves tagIds into the tags relation when provided', async () => {
+      const product = mockProduct();
+      const tags = [{ id: 3 }] as Tag[];
+
+      productRepo.findOne.mockResolvedValue(product);
+      tagRepo.find.mockResolvedValue(tags);
+      productRepo.save.mockResolvedValue({ ...product, tags });
+
+      await service.update(1, { tagIds: [3] });
+
+      expect(tagRepo.find).toHaveBeenCalledWith({ where: { id: expect.anything() } });
+      expect(product.tags).toEqual(tags);
+    });
+
+    it('leaves tags untouched when tagIds is not provided', async () => {
+      const product = mockProduct();
+      product.tags = [{ id: 9 } as Tag];
+      productRepo.findOne.mockResolvedValue(product);
+      productRepo.save.mockResolvedValue(product);
+
+      await service.update(1, { name: 'Renamed' });
+
+      expect(tagRepo.find).not.toHaveBeenCalled();
+      expect(product.tags).toEqual([{ id: 9 }]);
+    });
+  });
+
+  describe('findAll', () => {
+    it('joins and filters by tag slug when query.tag is set', async () => {
+      const qb: Record<string, jest.Mock> = {};
+      const chain = [
+        'select', 'where', 'andWhere', 'leftJoin', 'addSelect', 'orderBy', 'offset', 'limit',
+      ];
+      chain.forEach(m => { qb[m] = jest.fn().mockReturnValue(qb); });
+      qb.getCount = jest.fn().mockResolvedValue(0);
+      qb.getRawMany = jest.fn().mockResolvedValue([]);
+
+      productRepo.createQueryBuilder.mockReturnValue(qb as any);
+
+      await service.findAll({ tag: 'sinh-vien', page: 1, limit: 20 } as any);
+
+      expect(qb.leftJoin).toHaveBeenCalledWith('product.tags', 'tag');
+      expect(qb.andWhere).toHaveBeenCalledWith('tag.slug = :tagSlug', { tagSlug: 'sinh-vien' });
     });
   });
 });

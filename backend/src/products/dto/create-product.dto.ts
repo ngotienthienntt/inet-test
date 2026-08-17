@@ -1,6 +1,7 @@
 import {
   IsArray,
   IsBoolean,
+  IsInt,
   IsNotEmpty,
   IsNumber,
   IsOptional,
@@ -69,4 +70,10 @@ export class CreateProductDto {
   @Type(() => CreateVariantDto)
   @IsOptional()
   variants?: CreateVariantDto[];
+
+  @ApiPropertyOptional({ type: [Number], example: [1, 2], description: 'IDs of audience tags to assign' })
+  @IsArray()
+  @IsInt({ each: true })
+  @IsOptional()
+  tagIds?: number[];
 }

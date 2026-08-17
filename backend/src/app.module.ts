@@ -11,6 +11,7 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { CategoriesModule } from './categories/categories.module';
+import { TagsModule } from './tags/tags.module';
 import { ProductsModule } from './products/products.module';
 import { ElasticsearchModule } from './elasticsearch/elasticsearch.module';
 import { SearchModule } from './search/search.module';
@@ -60,6 +61,7 @@ import { BannersModule } from './banners/banners.module';
     AuthModule,
     UsersModule,
     CategoriesModule,
+    TagsModule,
     ProductsModule,
     SearchModule,
     CartModule,

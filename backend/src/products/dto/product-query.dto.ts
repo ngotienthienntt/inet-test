@@ -20,6 +20,11 @@ export class ProductQueryDto {
   @IsOptional()
   category?: string;
 
+  @ApiPropertyOptional({ example: 'sinh-vien', description: 'Filter by audience tag slug' })
+  @IsString()
+  @IsOptional()
+  tag?: string;
+
   @ApiPropertyOptional({ example: 500000, description: 'Minimum price filter (VND)' })
   @Type(() => Number)
   @IsNumber()

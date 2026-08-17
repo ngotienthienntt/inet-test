@@ -3,12 +3,15 @@ import {
   CreateDateColumn,
   Entity,
   JoinColumn,
+  JoinTable,
+  ManyToMany,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { Category } from '../../categories/entities/category.entity';
+import { Tag } from '../../tags/entities/tag.entity';
 import { ProductImage } from './product-image.entity';
 import { ProductSpec } from './product-spec.entity';
 import { Variant } from './variant.entity';
@@ -51,6 +54,14 @@ export class Product {
 
   @OneToMany(() => Variant, (v) => v.product, { cascade: true })
   variants: Variant[];
+
+  @ManyToMany(() => Tag)
+  @JoinTable({
+    name: 'product_tags',
+    joinColumn: { name: 'product_id' },
+    inverseJoinColumn: { name: 'tag_id' },
+  })
+  tags: Tag[];
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
