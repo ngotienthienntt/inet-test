@@ -32,7 +32,7 @@ export interface ProductDetail extends Product {
   variants: ProductVariant[]
 }
 
-export type BannerPosition = 'homepage_before_categories'
+export type BannerPosition = 'homepage_before_categories' | 'shop_top'
 
 export interface Banner {
   id: number
