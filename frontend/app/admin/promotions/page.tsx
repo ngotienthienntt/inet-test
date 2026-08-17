@@ -10,7 +10,7 @@ function getToken() { return typeof window !== 'undefined' ? localStorage.getIte
 
 const POSITION_LABELS: Record<BannerPosition, string> = {
   homepage_before_categories: 'Trang chủ – trước danh mục',
-  shop_top: 'Trang Shop – đầu trang',
+  shop_top: 'Trang danh mục – đầu trang',
 }
 
 const POSITION_OPTIONS = Object.keys(POSITION_LABELS) as BannerPosition[]
