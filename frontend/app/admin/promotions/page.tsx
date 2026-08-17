@@ -153,12 +153,41 @@ export default function AdminPromotionsPage() {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Ảnh <span className="text-red-500">*</span></label>
-              {form.imageUrl && (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={form.imageUrl} alt="" className="w-full h-24 object-cover rounded-lg mb-2 border border-gray-200" />
-              )}
-              <input ref={fileInputRef} type="file" accept="image/*" onChange={e => handleUpload(e.target.files)} className="text-sm" />
-              {uploading && <p className="text-xs text-gray-400 mt-1">Đang tải ảnh...</p>}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/webp,image/gif"
+                className="hidden"
+                onChange={e => handleUpload(e.target.files)}
+              />
+              <div
+                onClick={() => !uploading && fileInputRef.current?.click()}
+                onDragOver={e => e.preventDefault()}
+                onDrop={e => { e.preventDefault(); if (!uploading) handleUpload(e.dataTransfer.files) }}
+                className={`relative border-2 border-dashed border-gray-200 rounded-xl p-4 text-center transition-colors ${uploading ? 'cursor-wait opacity-70' : 'cursor-pointer hover:border-[#3762cc] hover:bg-blue-50/30'}`}
+              >
+                {uploading ? (
+                  <div className="w-6 h-6 mx-auto border-2 border-[#3762cc] border-t-transparent rounded-full animate-spin" />
+                ) : form.imageUrl ? (
+                  <>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={form.imageUrl} alt="" className="w-full h-24 object-cover rounded-lg" />
+                    <button
+                      type="button"
+                      onClick={e => { e.stopPropagation(); setForm(p => ({ ...p, imageUrl: '' })) }}
+                      className="absolute top-2 right-2 w-6 h-6 bg-red-500 text-white rounded-full text-xs flex items-center justify-center hover:bg-red-600 leading-none"
+                    >
+                      ×
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <div className="text-3xl mb-2">📷</div>
+                    <p className="text-sm font-medium text-gray-700">Kéo thả hoặc click để chọn ảnh</p>
+                    <p className="text-xs text-gray-400 mt-1">JPEG, PNG, WebP, GIF · Tối đa 5MB</p>
+                  </>
+                )}
+              </div>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Link URL</label>
