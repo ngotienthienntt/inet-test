@@ -280,9 +280,9 @@ export default function NewProductPage() {
 
         {/* Audience tags */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 space-y-3">
-          <h2 className="font-semibold text-gray-900">Đối tượng sử dụng</h2>
+          <h2 className="font-semibold text-gray-900">Tag đối tượng sử dụng</h2>
           {allTags.length === 0 ? (
-            <p className="text-sm text-gray-400">Chưa có tag nào — tạo ở trang Đối tượng.</p>
+            <p className="text-sm text-gray-400">Chưa có tag nào — tạo ở trang Tag đối tượng sử dụng.</p>
           ) : (
             <div className="flex flex-wrap gap-2">
               {allTags.map(t => (

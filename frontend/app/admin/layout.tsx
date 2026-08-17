@@ -7,7 +7,7 @@ const NAV_ITEMS = [
   { href: '/admin', label: 'Dashboard', icon: '📊', exact: true },
   { href: '/admin/products', label: 'Sản phẩm', icon: '📦' },
   { href: '/admin/categories', label: 'Danh mục', icon: '🗂️' },
-  { href: '/admin/tags', label: 'Đối tượng', icon: '🏷️' },
+  { href: '/admin/tags', label: 'Tag đối tượng sử dụng', icon: '🏷️' },
   { href: '/admin/promotions', label: 'Khuyến mại', icon: '🎁' },
   { href: '/admin/orders', label: 'Đơn hàng', icon: '🛒' },
   { href: '/admin/customers', label: 'Khách hàng', icon: '👥' },
