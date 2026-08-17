@@ -41,6 +41,8 @@ describe('AuthService', () => {
           useValue: {
             findByEmail: jest.fn(),
             create: jest.fn(),
+            findById: jest.fn(),
+            updatePasswordHash: jest.fn(),
           },
         },
         {
@@ -127,6 +129,40 @@ describe('AuthService', () => {
 
       await expect(
         service.login({ email: 'nobody@example.com', password: 'any' }),
+      ).rejects.toThrow(UnauthorizedException);
+    });
+  });
+
+  describe('changePassword', () => {
+    it('verifies the current password and updates the hash on success', async () => {
+      const user = mockUser();
+      usersService.findById.mockResolvedValue(user);
+      bcrypt.compare.mockResolvedValue(true);
+      bcrypt.hash.mockResolvedValue('$2b$10$newhashedpassword');
+
+      await service.changePassword(user.id, { currentPassword: 'correctOld', newPassword: 'brandNewPass123' });
+
+      expect(bcrypt.compare).toHaveBeenCalledWith('correctOld', user.passwordHash);
+      expect(bcrypt.hash).toHaveBeenCalledWith('brandNewPass123', 10);
+      expect(usersService.updatePasswordHash).toHaveBeenCalledWith(user.id, '$2b$10$newhashedpassword');
+    });
+
+    it('throws UnauthorizedException when the current password is wrong', async () => {
+      const user = mockUser();
+      usersService.findById.mockResolvedValue(user);
+      bcrypt.compare.mockResolvedValue(false);
+
+      await expect(
+        service.changePassword(user.id, { currentPassword: 'wrongOld', newPassword: 'brandNewPass123' }),
+      ).rejects.toThrow(UnauthorizedException);
+      expect(usersService.updatePasswordHash).not.toHaveBeenCalled();
+    });
+
+    it('throws UnauthorizedException when the user does not exist', async () => {
+      usersService.findById.mockResolvedValue(null);
+
+      await expect(
+        service.changePassword(999, { currentPassword: 'any', newPassword: 'brandNewPass123' }),
       ).rejects.toThrow(UnauthorizedException);
     });
   });

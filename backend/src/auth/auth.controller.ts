@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Patch, Post, Req, UseGuards } from '@nestjs/common';
 import type { Request } from 'express';
 import {
   ApiTags,
@@ -11,6 +11,7 @@ import { AuthService } from './auth.service';
 import type { SanitizedUser } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
+import { ChangePasswordDto } from './dto/change-password.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { User } from '../users/entities/user.entity';
 
@@ -57,5 +58,20 @@ export class AuthController {
   @Get('me')
   getMe(@Req() req: Request): SanitizedUser {
     return sanitizeUser(req.user as User);
+  }
+
+  @ApiOperation({ summary: "Change the current authenticated user's password" })
+  @ApiResponse({ status: 200, description: 'Password changed successfully' })
+  @ApiResponse({ status: 401, description: 'Unauthorized — invalid/missing JWT, or current password incorrect' })
+  @ApiBearerAuth('access-token')
+  @UseGuards(JwtAuthGuard)
+  @Patch('change-password')
+  async changePassword(
+    @Req() req: Request,
+    @Body() dto: ChangePasswordDto,
+  ): Promise<{ message: string }> {
+    const user = req.user as User;
+    await this.authService.changePassword(user.id, dto);
+    return { message: 'Đổi mật khẩu thành công' };
   }
 }

@@ -42,4 +42,8 @@ export class UsersService {
     Object.assign(user, data);
     return this.usersRepository.save(user);
   }
+
+  async updatePasswordHash(id: number, passwordHash: string): Promise<void> {
+    await this.usersRepository.update(id, { passwordHash });
+  }
 }

@@ -8,9 +8,12 @@ import * as bcrypt from 'bcrypt';
 import { UsersService } from '../users/users.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
+import { ChangePasswordDto } from './dto/change-password.dto';
 import { User } from '../users/entities/user.entity';
 import { JwtPayload } from '../common/types/index';
 import { generateSessionToken } from '../common/utils/format.util';
+
+const BCRYPT_ROUNDS = 10;
 
 export type SanitizedUser = Omit<User, 'passwordHash'>;
 
@@ -64,6 +67,21 @@ export class AuthService {
 
   generateGuestToken(): GuestResult {
     return { sessionToken: generateSessionToken() };
+  }
+
+  async changePassword(userId: number, dto: ChangePasswordDto): Promise<void> {
+    const user = await this.usersService.findById(userId);
+    if (!user) {
+      throw new UnauthorizedException('Người dùng không tồn tại');
+    }
+
+    const currentMatches = await bcrypt.compare(dto.currentPassword, user.passwordHash);
+    if (!currentMatches) {
+      throw new UnauthorizedException('Mật khẩu hiện tại không đúng');
+    }
+
+    const passwordHash = await bcrypt.hash(dto.newPassword, BCRYPT_ROUNDS);
+    await this.usersService.updatePasswordHash(userId, passwordHash);
   }
 
   private generateToken(user: User): string {
