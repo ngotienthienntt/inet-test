@@ -49,8 +49,8 @@ export default function AdminCustomersPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-[#1c3b71]">Khach hang</h1>
-        <p className="text-sm text-gray-500 mt-1">{total} khach hang</p>
+        <h1 className="text-2xl font-bold text-[#1c3b71]">Khách hàng</h1>
+        <p className="text-sm text-gray-500 mt-1">{total} khách hàng</p>
       </div>
 
       <div className="bg-white rounded-xl shadow-sm border border-gray-100">
@@ -58,31 +58,31 @@ export default function AdminCustomersPage() {
           <form onSubmit={handleSearch} className="flex gap-2">
             <input
               type="text"
-              placeholder="Tim kiem ten, email..."
+              placeholder="Tìm kiếm tên, email..."
               value={search}
               onChange={e => setSearch(e.target.value)}
               className="flex-1 max-w-sm border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#3762cc]"
             />
             <button type="submit" className="px-4 py-2 bg-[#3762cc] text-white rounded-lg text-sm font-medium hover:bg-[#2a4fa3]">
-              Tim
+              Tìm
             </button>
           </form>
         </div>
 
         {loading ? (
-          <div className="p-8 text-center text-gray-400">Dang tai...</div>
+          <div className="p-8 text-center text-gray-400">Đang tải...</div>
         ) : customers.length === 0 ? (
-          <div className="p-8 text-center text-gray-400">Khong co khach hang nao</div>
+          <div className="p-8 text-center text-gray-400">Không có khách hàng nào</div>
         ) : (
           <>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="text-left text-gray-500 text-xs uppercase tracking-wide bg-gray-50">
-                    <th className="px-6 py-3 font-medium">Ho ten</th>
+                    <th className="px-6 py-3 font-medium">Họ tên</th>
                     <th className="px-6 py-3 font-medium">Email</th>
-                    <th className="px-6 py-3 font-medium">Ngay tao</th>
-                    <th className="px-6 py-3 font-medium">Trang thai</th>
+                    <th className="px-6 py-3 font-medium">Ngày tạo</th>
+                    <th className="px-6 py-3 font-medium">Trạng thái</th>
                     <th className="px-6 py-3 font-medium"></th>
                   </tr>
                 </thead>
@@ -97,12 +97,12 @@ export default function AdminCustomersPage() {
                       <td className="px-6 py-4 text-gray-400 text-xs">{new Date(c.createdAt).toLocaleDateString('vi-VN')}</td>
                       <td className="px-6 py-4">
                         <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${c.isActive ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                          {c.isActive ? 'Hoat dong' : 'Da khoa'}
+                          {c.isActive ? 'Hoạt động' : 'Đã khóa'}
                         </span>
                       </td>
                       <td className="px-6 py-4">
                         <Link href={`/admin/customers/${c.id}`} className="text-[#3762cc] hover:underline text-xs">
-                          Xem chi tiet
+                          Xem chi tiết
                         </Link>
                       </td>
                     </tr>
@@ -120,7 +120,7 @@ export default function AdminCustomersPage() {
                     onClick={() => { const p = page - 1; setPage(p); load(p) }}
                     className="px-3 py-1.5 border border-gray-200 rounded-lg text-gray-600 hover:bg-gray-50 disabled:opacity-40"
                   >
-                    Truoc
+                    Trước
                   </button>
                   <button
                     disabled={page === totalPages}
