@@ -43,6 +43,7 @@ interface ApiProduct {
   review_count?: number
   inStock?: boolean
   in_stock?: boolean
+  tags?: { id: number; name: string; slug: string }[]
 }
 
 const PLACEHOLDER = 'https://placehold.co/300x300/e2e8f0/64748b'
@@ -68,6 +69,7 @@ function mapProduct(p: ApiProduct): Product {
     reviewCount: Number(p.reviewCount ?? p.review_count ?? 0),
     inStock: p.inStock ?? p.in_stock ?? true,
     variantId: p.variants?.[0]?.id ? Number(p.variants[0].id) : undefined,
+    tags: p.tags ?? [],
   }
 }
 

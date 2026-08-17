@@ -12,6 +12,7 @@ export interface Product {
   reviewCount: number
   inStock: boolean
   variantId?: number
+  tags?: { id: number; name: string; slug: string }[]
 }
 
 export interface ProductVariant {
