@@ -143,7 +143,7 @@ export default function AdminPromotionsPage() {
 
       {showForm && (
         <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 space-y-4">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-4xl p-6 space-y-4">
             <h2 className="font-bold text-lg text-[#1c3b71]">{editTarget ? 'Sửa banner' : 'Thêm banner'}</h2>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Vị trí <span className="text-red-500">*</span></label>
