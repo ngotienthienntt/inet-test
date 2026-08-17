@@ -115,15 +115,19 @@ export default function ProductCard({ product }: ProductCardProps) {
 
         <StarRating rating={product.rating} reviewCount={product.reviewCount} />
 
-        {product.tags && product.tags.length > 0 && (
-          <div className="flex flex-wrap gap-1 mt-1.5">
-            {product.tags.map(tag => (
+        <div className="flex flex-wrap gap-1 mt-1.5">
+          {product.tags && product.tags.length > 0 ? (
+            product.tags.map(tag => (
               <span key={tag.id} className="text-[10px] font-medium text-[#3762cc] bg-blue-50 px-1.5 py-0.5 rounded">
                 {tag.name}
               </span>
-            ))}
-          </div>
-        )}
+            ))
+          ) : (
+            <span className="text-[10px] font-medium text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded">
+              Tất cả
+            </span>
+          )}
+        </div>
 
         <div className="mt-2 mb-3">
           <p className="text-base font-bold text-[#f5821f]">
