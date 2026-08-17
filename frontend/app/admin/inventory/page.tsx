@@ -1,8 +1,8 @@
 'use client'
 import { useEffect, useState } from 'react'
+import { adminFetch } from '@/lib/adminFetch'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api'
-function getToken() { return typeof window !== 'undefined' ? localStorage.getItem('shopvn_token') || '' : '' }
 
 interface Variant {
   id: number
@@ -20,7 +20,7 @@ export default function InventoryPage() {
   const [edits, setEdits] = useState<Record<number, string>>({})
 
   useEffect(() => {
-    fetch(`${API_URL}/products?limit=200`, { headers: { Authorization: `Bearer ${getToken()}` } })
+    adminFetch(`${API_URL}/products?limit=200`)
       .then(r => r.json())
       .then(data => {
         const products = Array.isArray(data) ? data : data?.products ?? data?.data ?? []
@@ -42,9 +42,9 @@ export default function InventoryPage() {
     if (isNaN(newStock) || newStock < 0) return
     setSaving(variantId)
     try {
-      await fetch(`${API_URL}/products/variants/${variantId}/stock`, {
+      await adminFetch(`${API_URL}/products/variants/${variantId}/stock`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken()}` },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ stock: newStock }),
       })
       setVariants(prev => prev.map(v => v.id === variantId ? { ...v, stock: newStock } : v))

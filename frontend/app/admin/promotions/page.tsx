@@ -4,9 +4,9 @@ import { ToastContainer } from '@/components/ui/Toast'
 import { useToast } from '@/hooks/useToast'
 import ConfirmDialog from '@/components/ui/ConfirmDialog'
 import type { Banner, BannerPosition } from '@/lib/types'
+import { adminFetch } from '@/lib/adminFetch'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api'
-function getToken() { return typeof window !== 'undefined' ? localStorage.getItem('shopvn_token') || '' : '' }
 
 const POSITION_LABELS: Record<BannerPosition, string> = {
   homepage_before_categories: 'Trang chủ – trước danh mục',
@@ -38,7 +38,7 @@ export default function AdminPromotionsPage() {
 
   function load() {
     setLoading(true)
-    fetch(`${API_URL}/banners`, { headers: { Authorization: `Bearer ${getToken()}` } })
+    adminFetch(`${API_URL}/banners`)
       .then(r => r.json())
       .then(data => setBanners(Array.isArray(data) ? data : []))
       .finally(() => setLoading(false))
@@ -72,9 +72,8 @@ export default function AdminPromotionsPage() {
     try {
       const fd = new FormData()
       fd.append('file', files[0])
-      const res = await fetch(`${API_URL}/upload/image`, {
+      const res = await adminFetch(`${API_URL}/upload/image`, {
         method: 'POST',
-        headers: { Authorization: `Bearer ${getToken()}` },
         body: fd,
       })
       const data = await res.json()
@@ -100,9 +99,9 @@ export default function AdminPromotionsPage() {
       }
       const url = editTarget ? `${API_URL}/banners/${editTarget.id}` : `${API_URL}/banners`
       const method = editTarget ? 'PATCH' : 'POST'
-      const res = await fetch(url, {
+      const res = await adminFetch(url, {
         method,
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken()}` },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
       })
       const data = await res.json()
@@ -119,7 +118,7 @@ export default function AdminPromotionsPage() {
   }
 
   async function doDelete(id: number, label: string) {
-    const res = await fetch(`${API_URL}/banners/${id}`, { method: 'DELETE', headers: { Authorization: `Bearer ${getToken()}` } })
+    const res = await adminFetch(`${API_URL}/banners/${id}`, { method: 'DELETE' })
     if (!res.ok) {
       const data = await res.json().catch(() => ({}))
       toast(data.message || 'Không thể xóa banner', 'error')

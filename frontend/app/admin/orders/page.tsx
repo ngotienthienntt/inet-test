@@ -1,9 +1,9 @@
 'use client'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { adminFetch } from '@/lib/adminFetch'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api'
-function getToken() { return typeof window !== 'undefined' ? localStorage.getItem('shopvn_token') || '' : '' }
 function formatVND(n: number) { return n.toLocaleString('vi-VN') + ' ₫' }
 
 interface Order {
@@ -41,9 +41,8 @@ export default function AdminOrdersPage() {
   const [search, setSearch] = useState('')
 
   useEffect(() => {
-    const token = getToken()
     // Use admin stats endpoint to get all orders, or fallback to a general endpoint
-    fetch(`${API_URL}/admin/stats`, { headers: { Authorization: `Bearer ${token}` } })
+    adminFetch(`${API_URL}/admin/stats`)
       .then(r => r.json())
       .then(data => {
         // stats returns recentOrders (last 10). For full list, fetch separately

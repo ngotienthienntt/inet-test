@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { ToastContainer } from '@/components/ui/Toast'
 import { useToast } from '@/hooks/useToast'
 import ConfirmDialog from '@/components/ui/ConfirmDialog'
+import { adminFetch } from '@/lib/adminFetch'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api'
 const PAGE_SIZE = 10
@@ -17,11 +18,6 @@ interface Product {
   inStock: boolean
   isActive: boolean
   images: string[]
-}
-
-function getToken() {
-  if (typeof window === 'undefined') return ''
-  return localStorage.getItem('shopvn_token') || ''
 }
 
 function formatVND(n: number) { return n.toLocaleString('vi-VN') + ' ₫' }
@@ -61,7 +57,7 @@ export default function AdminProductsPage() {
     setLoading(true)
     const params = new URLSearchParams({ page: String(page), limit: String(PAGE_SIZE), all: 'true' })
     if (search) params.set('q', search)
-    fetch(`${API_URL}/products?${params}`, { headers: { Authorization: `Bearer ${getToken()}` } })
+    adminFetch(`${API_URL}/products?${params}`)
       .then(r => r.json())
       .then(data => {
         const arr: unknown[] = Array.isArray(data) ? data : data?.data ?? data?.products ?? []
@@ -81,7 +77,7 @@ export default function AdminProductsPage() {
   }
 
   async function doDelete(id: number, name: string) {
-    const res = await fetch(`${API_URL}/products/${id}`, { method: 'DELETE', headers: { Authorization: `Bearer ${getToken()}` } })
+    const res = await adminFetch(`${API_URL}/products/${id}`, { method: 'DELETE' })
     if (!res.ok) {
       const data = await res.json().catch(() => ({}))
       toast(data.message || 'Không thể xóa sản phẩm', 'error')

@@ -3,9 +3,9 @@ import { useEffect, useState } from 'react'
 import { ToastContainer } from '@/components/ui/Toast'
 import { useToast } from '@/hooks/useToast'
 import ConfirmDialog from '@/components/ui/ConfirmDialog'
+import { adminFetch } from '@/lib/adminFetch'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api'
-function getToken() { return typeof window !== 'undefined' ? localStorage.getItem('shopvn_token') || '' : '' }
 
 interface Category {
   id: number
@@ -36,7 +36,7 @@ export default function AdminCategoriesPage() {
 
   function load() {
     setLoading(true)
-    fetch(`${API_URL}/categories?all=true`, { headers: { Authorization: `Bearer ${getToken()}` } })
+    adminFetch(`${API_URL}/categories?all=true`)
       .then(r => r.json())
       .then(data => setCategories(Array.isArray(data) ? data : data?.data ?? []))
       .finally(() => setLoading(false))
@@ -65,9 +65,9 @@ export default function AdminCategoriesPage() {
       const body = { name: form.name, slug: form.slug, description: form.description || undefined, parentId: form.parentId ? Number(form.parentId) : null, isActive: form.isActive }
       const url = editTarget ? `${API_URL}/categories/${editTarget.id}` : `${API_URL}/categories`
       const method = editTarget ? 'PATCH' : 'POST'
-      const res = await fetch(url, {
+      const res = await adminFetch(url, {
         method,
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken()}` },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
       })
       const data = await res.json()
@@ -79,7 +79,7 @@ export default function AdminCategoriesPage() {
   }
 
   async function doDelete(id: number, name: string) {
-    const res = await fetch(`${API_URL}/categories/${id}`, { method: 'DELETE', headers: { Authorization: `Bearer ${getToken()}` } })
+    const res = await adminFetch(`${API_URL}/categories/${id}`, { method: 'DELETE' })
     if (!res.ok) {
       const data = await res.json().catch(() => ({}))
       toast(data.message || 'Không thể xóa danh mục', 'error')

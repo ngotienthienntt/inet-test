@@ -1,9 +1,9 @@
 'use client'
 import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
+import { adminFetch } from '@/lib/adminFetch'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api'
-function getToken() { return typeof window !== 'undefined' ? localStorage.getItem('shopvn_token') || '' : '' }
 
 interface Category { id: number; name: string; slug: string }
 interface Tag { id: number; name: string; slug: string }
@@ -39,11 +39,11 @@ export default function NewProductPage() {
   const [variants, setVariants] = useState<{ size: string; colorName: string; colorHex: string; stock: string; price: string }[]>([])
 
   useEffect(() => {
-    fetch(`${API_URL}/categories`, { headers: { Authorization: `Bearer ${getToken()}` } })
+    adminFetch(`${API_URL}/categories`)
       .then(r => r.json())
       .then(data => setCategories(Array.isArray(data) ? data : data?.data ?? []))
       .catch(() => {})
-    fetch(`${API_URL}/tags`, { headers: { Authorization: `Bearer ${getToken()}` } })
+    adminFetch(`${API_URL}/tags`)
       .then(r => r.json())
       .then(data => setAllTags(Array.isArray(data) ? data : []))
       .catch(() => {})
@@ -70,9 +70,8 @@ export default function NewProductPage() {
       try {
         const fd = new FormData()
         fd.append('file', file)
-        const res = await fetch(`${API_URL}/upload/image`, {
+        const res = await adminFetch(`${API_URL}/upload/image`, {
           method: 'POST',
-          headers: { Authorization: `Bearer ${getToken()}` },
           body: fd,
         })
         const data = await res.json()
@@ -122,9 +121,9 @@ export default function NewProductPage() {
           }
         }),
       }
-      const res = await fetch(`${API_URL}/products`, {
+      const res = await adminFetch(`${API_URL}/products`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken()}` },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
       })
       const data = await res.json()

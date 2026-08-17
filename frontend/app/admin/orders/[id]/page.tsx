@@ -1,9 +1,9 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
+import { adminFetch } from '@/lib/adminFetch'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api'
-function getToken() { return typeof window !== 'undefined' ? localStorage.getItem('shopvn_token') || '' : '' }
 function formatVND(n: number) { return n.toLocaleString('vi-VN') + ' ₫' }
 
 interface OrderItem { id: number; productName: string; variantLabel?: string; price: number; quantity: number; lineTotal: number }
@@ -34,7 +34,7 @@ export default function AdminOrderDetailPage() {
   const [updating, setUpdating] = useState(false)
 
   useEffect(() => {
-    fetch(`${API_URL}/orders/${params.id}`, { headers: { Authorization: `Bearer ${getToken()}` } })
+    adminFetch(`${API_URL}/orders/${params.id}`)
       .then(r => r.json())
       .then(data => { setOrder(data); setNewStatus(data.status) })
       .finally(() => setLoading(false))
@@ -44,9 +44,9 @@ export default function AdminOrderDetailPage() {
     if (!newStatus || newStatus === order?.status) return
     setUpdating(true)
     try {
-      const res = await fetch(`${API_URL}/orders/${params.id}/status`, {
+      const res = await adminFetch(`${API_URL}/orders/${params.id}/status`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken()}` },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus }),
       })
       const data = await res.json()

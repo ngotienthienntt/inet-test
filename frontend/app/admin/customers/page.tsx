@@ -1,9 +1,9 @@
 'use client'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { adminFetch } from '@/lib/adminFetch'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api'
-function getToken() { return typeof window !== 'undefined' ? localStorage.getItem('shopvn_token') || '' : '' }
 
 interface Customer {
   id: number
@@ -26,7 +26,7 @@ export default function AdminCustomersPage() {
     setLoading(true)
     const params = new URLSearchParams({ page: String(p), limit: String(LIMIT) })
     if (q) params.set('search', q)
-    fetch(`${API_URL}/admin/customers?${params}`, { headers: { Authorization: `Bearer ${getToken()}` } })
+    adminFetch(`${API_URL}/admin/customers?${params}`)
       .then(r => r.json())
       .then(data => {
         setCustomers(data.data ?? [])

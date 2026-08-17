@@ -1,8 +1,8 @@
 'use client'
 import { useState, useEffect } from 'react'
+import { adminFetch } from '@/lib/adminFetch'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api'
-function getToken() { return typeof window !== 'undefined' ? localStorage.getItem('shopvn_token') || '' : '' }
 
 const SETTINGS_KEY = 'shopvn_admin_settings'
 
@@ -57,9 +57,9 @@ export default function AdminSettingsPage() {
     if (passwords.newPass.length < 8) { setPwError('Mat khau phai co it nhat 8 ky tu'); return }
     setPwSaving(true)
     try {
-      const res = await fetch(`${API_URL}/auth/change-password`, {
+      const res = await adminFetch(`${API_URL}/auth/change-password`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken()}` },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ currentPassword: passwords.current, newPassword: passwords.newPass }),
       })
       if (res.ok) {

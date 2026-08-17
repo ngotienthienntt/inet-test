@@ -2,9 +2,9 @@
 import { useState, useEffect, useRef } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import Link from 'next/link'
+import { adminFetch } from '@/lib/adminFetch'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api'
-function getToken() { return typeof window !== 'undefined' ? localStorage.getItem('shopvn_token') || '' : '' }
 
 function slugify(str: string) {
   return str.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9\s-]/g, '').trim().replace(/\s+/g, '-')
@@ -41,11 +41,10 @@ export default function EditProductPage() {
   const [variants, setVariants] = useState<{ size: string; colorName: string; colorHex: string; stock: string; price: string }[]>([])
 
   useEffect(() => {
-    const token = getToken()
     Promise.all([
-      fetch(`${API_URL}/products/id/${params.id}`, { headers: { Authorization: `Bearer ${token}` } }).then(r => r.json()),
-      fetch(`${API_URL}/categories`, { headers: { Authorization: `Bearer ${token}` } }).then(r => r.json()),
-      fetch(`${API_URL}/tags`, { headers: { Authorization: `Bearer ${token}` } }).then(r => r.json()),
+      adminFetch(`${API_URL}/products/id/${params.id}`).then(r => r.json()),
+      adminFetch(`${API_URL}/categories`).then(r => r.json()),
+      adminFetch(`${API_URL}/tags`).then(r => r.json()),
     ]).then(([product, cats, tags]) => {
       setCategories(Array.isArray(cats) ? cats : cats?.data ?? [])
       setAllTags(Array.isArray(tags) ? tags : [])
@@ -109,9 +108,8 @@ export default function EditProductPage() {
       try {
         const fd = new FormData()
         fd.append('file', file)
-        const res = await fetch(`${API_URL}/upload/image`, {
+        const res = await adminFetch(`${API_URL}/upload/image`, {
           method: 'POST',
-          headers: { Authorization: `Bearer ${getToken()}` },
           body: fd,
         })
         const data = await res.json()
@@ -161,9 +159,9 @@ export default function EditProductPage() {
           }
         }),
       }
-      const res = await fetch(`${API_URL}/products/${params.id}`, {
+      const res = await adminFetch(`${API_URL}/products/${params.id}`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken()}` },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
       })
       const data = await res.json()

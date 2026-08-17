@@ -1,9 +1,9 @@
 'use client'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { adminFetch } from '@/lib/adminFetch'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api'
-function getToken() { return typeof window !== 'undefined' ? localStorage.getItem('shopvn_token') || '' : '' }
 
 interface Stats {
   totalUsers: number
@@ -61,7 +61,7 @@ export default function AdminDashboardPage() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetch(`${API_URL}/admin/stats`, { headers: { Authorization: `Bearer ${getToken()}` } })
+    adminFetch(`${API_URL}/admin/stats`)
       .then(r => r.ok ? r.json() : null)
       .then(data => setStats(data))
       .finally(() => setLoading(false))

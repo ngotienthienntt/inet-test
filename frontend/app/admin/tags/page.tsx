@@ -4,9 +4,9 @@ import { ToastContainer } from '@/components/ui/Toast'
 import { useToast } from '@/hooks/useToast'
 import ConfirmDialog from '@/components/ui/ConfirmDialog'
 import type { Tag } from '@/lib/types'
+import { adminFetch } from '@/lib/adminFetch'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api'
-function getToken() { return typeof window !== 'undefined' ? localStorage.getItem('shopvn_token') || '' : '' }
 
 const EMPTY_FORM = { name: '', slug: '' }
 
@@ -27,7 +27,7 @@ export default function AdminTagsPage() {
 
   function load() {
     setLoading(true)
-    fetch(`${API_URL}/tags`, { headers: { Authorization: `Bearer ${getToken()}` } })
+    adminFetch(`${API_URL}/tags`)
       .then(r => r.json())
       .then(data => setTags(Array.isArray(data) ? data : []))
       .finally(() => setLoading(false))
@@ -55,9 +55,9 @@ export default function AdminTagsPage() {
     try {
       const url = editTarget ? `${API_URL}/tags/${editTarget.id}` : `${API_URL}/tags`
       const method = editTarget ? 'PATCH' : 'POST'
-      const res = await fetch(url, {
+      const res = await adminFetch(url, {
         method,
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken()}` },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),
       })
       const data = await res.json()
@@ -69,7 +69,7 @@ export default function AdminTagsPage() {
   }
 
   async function doDelete(id: number, name: string) {
-    const res = await fetch(`${API_URL}/tags/${id}`, { method: 'DELETE', headers: { Authorization: `Bearer ${getToken()}` } })
+    const res = await adminFetch(`${API_URL}/tags/${id}`, { method: 'DELETE' })
     if (!res.ok) {
       const data = await res.json().catch(() => ({}))
       toast(data.message || 'Không thể xóa tag', 'error')

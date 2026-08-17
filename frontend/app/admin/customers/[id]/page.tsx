@@ -1,9 +1,9 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
+import { adminFetch } from '@/lib/adminFetch'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api'
-function getToken() { return typeof window !== 'undefined' ? localStorage.getItem('shopvn_token') || '' : '' }
 
 interface Customer {
   id: number
@@ -23,7 +23,7 @@ export default function AdminCustomerDetailPage() {
   const [toggling, setToggling] = useState(false)
 
   useEffect(() => {
-    fetch(`${API_URL}/admin/customers/${params.id}`, { headers: { Authorization: `Bearer ${getToken()}` } })
+    adminFetch(`${API_URL}/admin/customers/${params.id}`)
       .then(r => r.json())
       .then(setCustomer)
       .finally(() => setLoading(false))
@@ -35,9 +35,8 @@ export default function AdminCustomerDetailPage() {
     if (!confirm(`Ban co chac muon ${action} tai khoan nay?`)) return
     setToggling(true)
     try {
-      const res = await fetch(`${API_URL}/admin/customers/${params.id}/toggle-ban`, {
+      const res = await adminFetch(`${API_URL}/admin/customers/${params.id}/toggle-ban`, {
         method: 'PATCH',
-        headers: { Authorization: `Bearer ${getToken()}` },
       })
       const data = await res.json()
       if (res.ok) setCustomer(prev => prev ? { ...prev, isActive: data.isActive } : prev)
