@@ -22,7 +22,7 @@ const DEFAULT_SETTINGS: StoreSettings = {
   contactPhone: '1900 1234',
   bankName: 'Vietcombank',
   bankAccount: '1234567890',
-  bankOwner: 'CONG TY SHOPVN',
+  bankOwner: 'CÔNG TY SHOPVN',
   freeShippingThreshold: '500000',
 }
 
@@ -53,8 +53,8 @@ export default function AdminSettingsPage() {
     e.preventDefault()
     setPwError('')
     setPwSuccess(false)
-    if (passwords.newPass !== passwords.confirm) { setPwError('Mat khau moi khong khop'); return }
-    if (passwords.newPass.length < 8) { setPwError('Mat khau phai co it nhat 8 ky tu'); return }
+    if (passwords.newPass !== passwords.confirm) { setPwError('Mật khẩu mới không khớp'); return }
+    if (passwords.newPass.length < 8) { setPwError('Mật khẩu phải có ít nhất 8 ký tự'); return }
     setPwSaving(true)
     try {
       const res = await adminFetch(`${API_URL}/auth/change-password`, {
@@ -67,25 +67,25 @@ export default function AdminSettingsPage() {
         setPasswords({ current: '', newPass: '', confirm: '' })
       } else {
         const data = await res.json()
-        setPwError(data.message || 'Loi doi mat khau')
+        setPwError(data.message || 'Lỗi đổi mật khẩu')
       }
-    } catch { setPwError('Loi ket noi') } finally { setPwSaving(false) }
+    } catch { setPwError('Lỗi kết nối') } finally { setPwSaving(false) }
   }
 
   return (
     <div className="max-w-2xl space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-[#1c3b71]">Cai dat</h1>
-        <p className="text-sm text-gray-500 mt-1">Quan ly cai dat cua hang va tai khoan</p>
+        <h1 className="text-2xl font-bold text-[#1c3b71]">Cài đặt</h1>
+        <p className="text-sm text-gray-500 mt-1">Quản lý cài đặt cửa hàng và tài khoản</p>
       </div>
 
       {/* Store settings */}
       <form onSubmit={handleSaveSettings} className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 space-y-5">
-        <h2 className="font-semibold text-gray-900">Cai dat cua hang</h2>
+        <h2 className="font-semibold text-gray-900">Cài đặt cửa hàng</h2>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="sm:col-span-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Ten cua hang</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Tên cửa hàng</label>
             <input
               value={settings.storeName}
               onChange={e => setSettings(p => ({ ...p, storeName: e.target.value }))}
@@ -93,7 +93,7 @@ export default function AdminSettingsPage() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Email lien he</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Email liên hệ</label>
             <input
               type="email"
               value={settings.contactEmail}
@@ -102,7 +102,7 @@ export default function AdminSettingsPage() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">So dien thoai</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Số điện thoại</label>
             <input
               value={settings.contactPhone}
               onChange={e => setSettings(p => ({ ...p, contactPhone: e.target.value }))}
@@ -112,10 +112,10 @@ export default function AdminSettingsPage() {
         </div>
 
         <div className="border-t border-gray-100 pt-5">
-          <h3 className="text-sm font-semibold text-gray-700 mb-3">Thong tin ngan hang (hien thi khi thanh toan)</h3>
+          <h3 className="text-sm font-semibold text-gray-700 mb-3">Thông tin ngân hàng (hiển thị khi thanh toán)</h3>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Ten ngan hang</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Tên ngân hàng</label>
               <input
                 value={settings.bankName}
                 onChange={e => setSettings(p => ({ ...p, bankName: e.target.value }))}
@@ -123,7 +123,7 @@ export default function AdminSettingsPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">So tai khoan</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Số tài khoản</label>
               <input
                 value={settings.bankAccount}
                 onChange={e => setSettings(p => ({ ...p, bankAccount: e.target.value }))}
@@ -131,7 +131,7 @@ export default function AdminSettingsPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Chu tai khoan</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Chủ tài khoản</label>
               <input
                 value={settings.bankOwner}
                 onChange={e => setSettings(p => ({ ...p, bankOwner: e.target.value }))}
@@ -142,7 +142,7 @@ export default function AdminSettingsPage() {
         </div>
 
         <div className="border-t border-gray-100 pt-5">
-          <label className="block text-sm font-medium text-gray-700 mb-1">Nguong mien phi van chuyen (VND)</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Ngưỡng miễn phí vận chuyển (VND)</label>
           <input
             type="number"
             min="0"
@@ -150,7 +150,7 @@ export default function AdminSettingsPage() {
             onChange={e => setSettings(p => ({ ...p, freeShippingThreshold: e.target.value }))}
             className="w-48 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#3762cc]"
           />
-          <p className="text-xs text-gray-400 mt-1">Don hang tren nguong nay se duoc mien phi van chuyen</p>
+          <p className="text-xs text-gray-400 mt-1">Đơn hàng trên ngưỡng này sẽ được miễn phí vận chuyển</p>
         </div>
 
         <div className="flex items-center gap-3 border-t border-gray-100 pt-4">
@@ -158,18 +158,18 @@ export default function AdminSettingsPage() {
             type="submit"
             className="px-6 py-2.5 bg-[#3762cc] text-white rounded-lg font-semibold text-sm hover:bg-[#2a4fa3] transition-colors"
           >
-            Luu cai dat
+            Lưu cài đặt
           </button>
-          {settingsSaved && <span className="text-sm text-green-600 font-medium">Da luu!</span>}
+          {settingsSaved && <span className="text-sm text-green-600 font-medium">Đã lưu!</span>}
         </div>
       </form>
 
       {/* Change password */}
       <form onSubmit={handleChangePassword} className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 space-y-4">
-        <h2 className="font-semibold text-gray-900">Doi mat khau</h2>
+        <h2 className="font-semibold text-gray-900">Đổi mật khẩu</h2>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Mat khau hien tai</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Mật khẩu hiện tại</label>
           <input
             type="password"
             value={passwords.current}
@@ -179,7 +179,7 @@ export default function AdminSettingsPage() {
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Mat khau moi</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Mật khẩu mới</label>
           <input
             type="password"
             value={passwords.newPass}
@@ -190,7 +190,7 @@ export default function AdminSettingsPage() {
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Xac nhan mat khau moi</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Xác nhận mật khẩu mới</label>
           <input
             type="password"
             value={passwords.confirm}
@@ -201,14 +201,14 @@ export default function AdminSettingsPage() {
         </div>
 
         {pwError && <p className="text-sm text-red-600 bg-red-50 rounded-lg px-3 py-2">{pwError}</p>}
-        {pwSuccess && <p className="text-sm text-green-600 bg-green-50 rounded-lg px-3 py-2">Mat khau da duoc cap nhat thanh cong!</p>}
+        {pwSuccess && <p className="text-sm text-green-600 bg-green-50 rounded-lg px-3 py-2">Mật khẩu đã được cập nhật thành công!</p>}
 
         <button
           type="submit"
           disabled={pwSaving}
           className="px-6 py-2.5 bg-[#1c3b71] text-white rounded-lg font-semibold text-sm hover:bg-[#162e5a] disabled:opacity-60 transition-colors"
         >
-          {pwSaving ? 'Dang luu...' : 'Cap nhat mat khau'}
+          {pwSaving ? 'Đang lưu...' : 'Cập nhật mật khẩu'}
         </button>
       </form>
     </div>
