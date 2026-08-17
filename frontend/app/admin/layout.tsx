@@ -77,6 +77,15 @@ function AvatarMenu({ onLogout }: { onLogout: () => void }) {
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [storeName, setStoreName] = useState('ShopVN')
+
+  useEffect(() => {
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api'
+    fetch(`${API_URL}/settings`)
+      .then(r => r.json())
+      .then(data => { if (data.storeName) setStoreName(data.storeName) })
+      .catch(() => {})
+  }, [])
 
   // Login page renders standalone — no sidebar, no top bar
   if (pathname === '/admin/login') {
@@ -108,7 +117,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         {/* Logo */}
         <div className="px-6 py-5 border-b border-white/10">
           <Link href="/admin" className="flex items-center gap-2">
-            <span className="text-white font-bold text-lg">ShopVN</span>
+            <span className="text-white font-bold text-lg">{storeName}</span>
             <span className="text-xs text-white/60 bg-white/10 px-2 py-0.5 rounded-full">Admin</span>
           </Link>
         </div>
