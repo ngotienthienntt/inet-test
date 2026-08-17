@@ -10,6 +10,7 @@ const PAGE_SIZE = 20
 interface ShopPageProps {
   searchParams: Promise<{
     category?: string
+    tag?: string
     minPrice?: string
     maxPrice?: string
     sort?: string
@@ -90,6 +91,7 @@ async function getPageTitle(category?: string, q?: string): Promise<string> {
 
 async function fetchProducts(params: {
   category?: string
+  tag?: string
   minPrice?: string
   maxPrice?: string
   sort?: string
@@ -100,6 +102,7 @@ async function fetchProducts(params: {
     const page = Math.max(1, parseInt(params.page ?? '1') || 1)
     const query = new URLSearchParams()
     if (params.category) query.set('category', params.category)
+    if (params.tag) query.set('tag', params.tag)
     if (params.minPrice) query.set('minPrice', params.minPrice)
     if (params.maxPrice) query.set('maxPrice', params.maxPrice)
     if (params.sort) query.set('sort', params.sort)

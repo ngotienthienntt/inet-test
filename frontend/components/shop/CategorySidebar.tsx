@@ -4,6 +4,7 @@ import { Suspense, useState } from 'react'
 import Link from 'next/link'
 import { useSearchParams, usePathname } from 'next/navigation'
 import { ChevronDown, ChevronUp } from 'lucide-react'
+import type { Tag } from '@/lib/types'
 
 const PRICE_RANGES = [
   { label: 'Dưới 5 triệu', minPrice: 0, maxPrice: 5000000 },
@@ -26,12 +27,13 @@ interface Category {
   children?: CategoryChild[]
 }
 
-function CategorySidebarInner({ categories }: { categories: Category[] }) {
+function CategorySidebarInner({ categories, tags }: { categories: Category[]; tags: Tag[] }) {
   const searchParams = useSearchParams()
   const pathname = usePathname()
 
   const activeCategory = searchParams.get('category')
   const activeMinPrice = searchParams.get('minPrice')
+  const activeTag = searchParams.get('tag')
 
   const [expandedIds, setExpandedIds] = useState<number[]>(() => {
     if (!activeCategory) return []
@@ -151,11 +153,38 @@ function CategorySidebarInner({ categories }: { categories: Category[] }) {
           })}
         </div>
       </div>
+
+      {tags.length > 0 && (
+        <>
+          <div className="border-t border-gray-100 my-4" />
+          <div>
+            <h3 className="text-sm font-semibold text-gray-700 mb-3 px-1">Lọc theo đối tượng sử dụng</h3>
+            <div className="space-y-1.5">
+              {tags.map(tag => {
+                const active = activeTag === tag.slug
+                const params = new URLSearchParams(searchParams.toString())
+                if (active) params.delete('tag'); else params.set('tag', tag.slug)
+                return (
+                  <Link
+                    key={tag.slug}
+                    href={`/shop?${params.toString()}`}
+                    className={`block px-3 py-2 rounded-lg text-sm text-center transition-colors ${
+                      active ? 'bg-[#3762cc] text-white font-medium' : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
+                    }`}
+                  >
+                    {tag.name}
+                  </Link>
+                )
+              })}
+            </div>
+          </div>
+        </>
+      )}
     </div>
   )
 }
 
-export default function CategorySidebar({ categories }: { categories: Category[] }) {
+export default function CategorySidebar({ categories, tags }: { categories: Category[]; tags: Tag[] }) {
   return (
     <Suspense
       fallback={
@@ -167,7 +196,7 @@ export default function CategorySidebar({ categories }: { categories: Category[]
         </div>
       }
     >
-      <CategorySidebarInner categories={categories} />
+      <CategorySidebarInner categories={categories} tags={tags} />
     </Suspense>
   )
 }

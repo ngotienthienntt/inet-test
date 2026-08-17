@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { SlidersHorizontal, X } from 'lucide-react'
 import CategorySidebar from './CategorySidebar'
+import type { Tag } from '@/lib/types'
 
 interface Category {
   id: number
@@ -14,9 +15,11 @@ interface Category {
 
 export function SlidersHorizontalWrapper({
   categories,
+  tags,
   children,
 }: {
   categories: Category[]
+  tags: Tag[]
   children: React.ReactNode
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -49,7 +52,7 @@ export function SlidersHorizontalWrapper({
               </button>
             </div>
             <div className="p-4">
-              <CategorySidebar categories={categories} />
+              <CategorySidebar categories={categories} tags={tags} />
             </div>
           </div>
         </div>
@@ -57,7 +60,7 @@ export function SlidersHorizontalWrapper({
 
       <div className="flex gap-6 items-start">
         <aside className="hidden lg:block w-64 shrink-0">
-          <CategorySidebar categories={categories} />
+          <CategorySidebar categories={categories} tags={tags} />
         </aside>
         <main className="flex-1 min-w-0">{children}</main>
       </div>

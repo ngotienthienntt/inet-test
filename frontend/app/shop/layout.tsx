@@ -1,6 +1,6 @@
 import { SlidersHorizontalWrapper } from '@/components/shop/SlidersWrapper'
-import CategorySidebar from '@/components/shop/CategorySidebar'
 import PromoBanner from '@/components/home/PromoBanner'
+import type { Tag } from '@/lib/types'
 
 interface Category {
   id: number
@@ -24,13 +24,25 @@ async function fetchCategories(): Promise<Category[]> {
   }
 }
 
+async function fetchTags(): Promise<Tag[]> {
+  try {
+    const baseUrl = process.env.INTERNAL_API_URL || 'http://localhost:3001/api'
+    const res = await fetch(`${baseUrl}/tags`, { next: { revalidate: 300 } })
+    if (!res.ok) return []
+    const data = await res.json()
+    return Array.isArray(data) ? data : []
+  } catch {
+    return []
+  }
+}
+
 export default async function ShopLayout({ children }: { children: React.ReactNode }) {
-  const categories = await fetchCategories()
+  const [categories, tags] = await Promise.all([fetchCategories(), fetchTags()])
 
   return (
     <div className="max-w-screen-xl mx-auto px-4 py-6 space-y-4">
       <PromoBanner position="shop_top" />
-      <SlidersHorizontalWrapper categories={categories}>
+      <SlidersHorizontalWrapper categories={categories} tags={tags}>
         {children}
       </SlidersHorizontalWrapper>
     </div>
