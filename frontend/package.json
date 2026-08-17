@@ -10,6 +10,7 @@
     "format": "prettier --write ."
   },
   "dependencies": {
+    "agentation": "^3.0.2",
     "axios": "^1.14.0",
     "lucide-react": "^1.7.0",
     "next": "16.2.1",
