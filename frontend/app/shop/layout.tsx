@@ -1,5 +1,6 @@
 import { SlidersHorizontalWrapper } from '@/components/shop/SlidersWrapper'
 import CategorySidebar from '@/components/shop/CategorySidebar'
+import PromoBanner from '@/components/home/PromoBanner'
 
 interface Category {
   id: number
@@ -27,7 +28,8 @@ export default async function ShopLayout({ children }: { children: React.ReactNo
   const categories = await fetchCategories()
 
   return (
-    <div className="max-w-screen-xl mx-auto px-4 py-6">
+    <div className="max-w-screen-xl mx-auto px-4 py-6 space-y-4">
+      <PromoBanner position="shop_top" />
       <SlidersHorizontalWrapper categories={categories}>
         {children}
       </SlidersHorizontalWrapper>

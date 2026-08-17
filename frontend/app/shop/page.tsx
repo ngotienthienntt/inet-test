@@ -2,7 +2,6 @@ import type { Metadata } from 'next'
 import ProductGrid from '@/components/shop/ProductGrid'
 import SortBar from '@/components/shop/SortBar'
 import Pagination from '@/components/shop/Pagination'
-import PromoBanner from '@/components/home/PromoBanner'
 import { Suspense } from 'react'
 import { type Product } from '@/lib/types'
 
@@ -147,7 +146,6 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
 
   return (
     <div className="py-6 space-y-4">
-      <PromoBanner position="shop_top" />
       <h1 className="text-2xl font-bold text-[#1c3b71]">{title}</h1>
       <Suspense>
         <SortBar />
