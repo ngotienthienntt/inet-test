@@ -146,13 +146,13 @@ export default function AdminPromotionsPage() {
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 space-y-4">
             <h2 className="font-bold text-lg text-[#1c3b71]">{editTarget ? 'Sửa banner' : 'Thêm banner'}</h2>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Vị trí *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Vị trí <span className="text-red-500">*</span></label>
               <select value={form.position} onChange={e => setForm(p => ({ ...p, position: e.target.value as BannerPosition }))} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#3762cc]">
                 {POSITION_OPTIONS.map(pos => <option key={pos} value={pos}>{POSITION_LABELS[pos]}</option>)}
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Ảnh *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Ảnh <span className="text-red-500">*</span></label>
               {form.imageUrl && (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={form.imageUrl} alt="" className="w-full h-24 object-cover rounded-lg mb-2 border border-gray-200" />
@@ -165,7 +165,7 @@ export default function AdminPromotionsPage() {
               <input value={form.linkUrl} onChange={e => setForm(p => ({ ...p, linkUrl: e.target.value }))} placeholder="/shop?category=dien-thoai" className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#3762cc]" />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Alt text *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Alt text <span className="text-red-500">*</span></label>
               <input value={form.altText} onChange={e => setForm(p => ({ ...p, altText: e.target.value }))} required className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#3762cc]" />
             </div>
             <div className="flex items-center justify-between py-1">
