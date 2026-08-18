@@ -305,6 +305,16 @@ export default function EditProductPage() {
         {/* Variants */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 space-y-3">
           <h2 className="font-semibold text-gray-900">Biến thể</h2>
+          {variants.length > 0 && (
+            <div className="grid grid-cols-6 gap-2 px-0.5 text-xs font-medium text-gray-500 uppercase tracking-wide">
+              <span>Size</span>
+              <span>Màu sắc</span>
+              <span>Mã màu</span>
+              <span>Tồn kho</span>
+              <span>Giá</span>
+              <span></span>
+            </div>
+          )}
           {variants.map((v, i) => (
             <div key={i} className="grid grid-cols-6 gap-2 items-center">
               <input placeholder="Size" value={v.size} onChange={e => { const vs = [...variants]; vs[i].size = e.target.value; setVariants(vs) }} className="border border-gray-200 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-[#3762cc]" />
