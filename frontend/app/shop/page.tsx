@@ -48,9 +48,16 @@ interface ApiProduct {
 
 const PLACEHOLDER = 'https://placehold.co/300x300/e2e8f0/64748b'
 
+// Multiple variants can carry different prices (size, color, ...) — listings
+// show the cheapest one, matching common "from ₫X" e-commerce convention.
+function cheapestVariant(variants?: ApiVariant[]): ApiVariant | undefined {
+  if (!variants || variants.length === 0) return undefined
+  return variants.reduce((min, v) => (v.price < min.price ? v : min), variants[0])
+}
+
 function mapProduct(p: ApiProduct): Product {
   const primaryImage = p.images?.find(i => i.isPrimary)?.url ?? p.images?.[0]?.url ?? PLACEHOLDER
-  const variant = p.variants?.[0]
+  const variant = cheapestVariant(p.variants)
   const price = Number(variant?.price ?? 0)
   const originalPrice = Number(variant?.originalPrice ?? price)
   const cat = typeof p.category === 'object' ? p.category : null
@@ -68,7 +75,7 @@ function mapProduct(p: ApiProduct): Product {
     rating: Number(p.rating ?? 0),
     reviewCount: Number(p.reviewCount ?? p.review_count ?? 0),
     inStock: p.inStock ?? p.in_stock ?? true,
-    variantId: p.variants?.[0]?.id ? Number(p.variants[0].id) : undefined,
+    variantId: variant?.id ? Number(variant.id) : undefined,
     tags: p.tags ?? [],
   }
 }

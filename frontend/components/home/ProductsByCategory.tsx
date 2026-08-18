@@ -72,8 +72,10 @@ function getImage(product: Product): string {
   return primary?.url ?? 'https://placehold.co/300x300/e2e8f0/64748b'
 }
 
+// Multiple variants can carry different prices (size, color, ...) — listings
+// show the cheapest one, matching common "from ₫X" e-commerce convention.
 function getPrice(product: Product): { price: number; originalPrice: number; variantId: number | undefined } {
-  const v = product.variants?.[0]
+  const v = product.variants?.reduce((min, c) => (c.price < min.price ? c : min), product.variants[0])
   return { price: v?.price ?? 0, originalPrice: v?.originalPrice ?? 0, variantId: v?.id }
 }
 
