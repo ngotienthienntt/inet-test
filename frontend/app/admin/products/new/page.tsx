@@ -253,11 +253,12 @@ export default function NewProductPage() {
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 space-y-3">
           <h2 className="font-semibold text-gray-900">Biến thể</h2>
           {variants.map((v, i) => (
-            <div key={i} className="grid grid-cols-5 gap-2 items-center">
+            <div key={i} className="grid grid-cols-6 gap-2 items-center">
               <input placeholder="Size" value={v.size} onChange={e => { const vs = [...variants]; vs[i].size = e.target.value; setVariants(vs) }} className="border border-gray-200 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-[#3762cc]" />
               <input placeholder="Màu sắc" value={v.colorName} onChange={e => { const vs = [...variants]; vs[i].colorName = e.target.value; setVariants(vs) }} className="border border-gray-200 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-[#3762cc]" />
               <input placeholder="#hex" value={v.colorHex} onChange={e => { const vs = [...variants]; vs[i].colorHex = e.target.value; setVariants(vs) }} className="border border-gray-200 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-[#3762cc]" />
               <input type="number" placeholder="Tồn kho" value={v.stock} onChange={e => { const vs = [...variants]; vs[i].stock = e.target.value; setVariants(vs) }} className="border border-gray-200 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-[#3762cc]" />
+              <input type="text" inputMode="numeric" placeholder="Giá (để trống = giá chung)" value={formatPrice(v.price)} onChange={e => { const vs = [...variants]; vs[i].price = parsePrice(e.target.value); setVariants(vs) }} className="border border-gray-200 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-[#3762cc]" />
               <button type="button" onClick={() => setVariants(vs => vs.filter((_, j) => j !== i))} className="text-red-400 hover:text-red-600 text-xs">X</button>
             </div>
           ))}
