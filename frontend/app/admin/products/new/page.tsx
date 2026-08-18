@@ -4,6 +4,8 @@ import { useRouter } from 'next/navigation'
 import { adminFetch } from '@/lib/adminFetch'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api'
+// Tạm thời ẩn Giá bán/Giá gốc — giá thật của sản phẩm lấy từ Biến thể.
+const SHOW_BASE_PRICE_FIELDS = false
 
 interface Category { id: number; name: string; slug: string }
 interface Tag { id: number; name: string; slug: string }
@@ -159,33 +161,39 @@ export default function NewProductPage() {
 
         {/* Pricing */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 space-y-4">
-          <h2 className="font-semibold text-gray-900">Giá bán</h2>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Giá bán <span className="text-red-500">*</span></label>
-              <input
-                type="text"
-                inputMode="numeric"
-                value={formatPrice(form.price)}
-                onChange={e => setField('price', parsePrice(e.target.value))}
-                required
-                placeholder="0"
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#3762cc]"
-              />
-              <p className="text-xs text-gray-400 mt-1">Chỉ áp dụng cho biến thể chưa nhập giá riêng — không ghi đè biến thể đã có giá</p>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Giá gốc</label>
-              <input
-                type="text"
-                inputMode="numeric"
-                value={formatPrice(form.originalPrice)}
-                onChange={e => setField('originalPrice', parsePrice(e.target.value))}
-                placeholder="0"
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#3762cc]"
-              />
-            </div>
-          </div>
+          {/* Giá bán / Giá gốc tạm thời ẩn — giá thật lấy từ Biến thể bên dưới.
+              Bật lại bằng cách đổi SHOW_BASE_PRICE_FIELDS thành true. */}
+          {SHOW_BASE_PRICE_FIELDS && (
+            <>
+              <h2 className="font-semibold text-gray-900">Giá bán</h2>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Giá bán <span className="text-red-500">*</span></label>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    value={formatPrice(form.price)}
+                    onChange={e => setField('price', parsePrice(e.target.value))}
+                    required
+                    placeholder="0"
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#3762cc]"
+                  />
+                  <p className="text-xs text-gray-400 mt-1">Chỉ áp dụng cho biến thể chưa nhập giá riêng — không ghi đè biến thể đã có giá</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Giá gốc</label>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    value={formatPrice(form.originalPrice)}
+                    onChange={e => setField('originalPrice', parsePrice(e.target.value))}
+                    placeholder="0"
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#3762cc]"
+                  />
+                </div>
+              </div>
+            </>
+          )}
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Danh mục</label>
