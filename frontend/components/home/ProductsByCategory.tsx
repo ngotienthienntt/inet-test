@@ -87,7 +87,9 @@ async function CategorySection({ category }: { category: Category }) {
     <section>
       <div className="flex items-center justify-between mb-5">
         <h2 className="text-xl font-bold text-[#1c3b71] flex items-center gap-2">
-          {category.icon && <span>{category.icon}</span>}
+          {category.icon && (
+            <Image src={category.icon} alt="" width={24} height={24} unoptimized className="w-6 h-6 object-contain" />
+          )}
           {category.name}
         </h2>
         <Link

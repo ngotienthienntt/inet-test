@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 
 interface Category {
   id: number
@@ -28,14 +29,16 @@ export default async function CategoryGrid() {
   return (
     <section>
       <h2 className="text-xl font-bold text-[#1c3b71] mb-4">Danh mục sản phẩm</h2>
-      <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+      <div className="flex flex-wrap justify-center gap-3 pb-2">
         {categories.map((category) => (
           <Link
             key={category.id}
             href={`/shop?category=${category.slug}`}
             className="flex-shrink-0 flex flex-col items-center gap-2 px-5 py-4 bg-white rounded-xl border border-gray-200 hover:border-[#3762cc] hover:shadow-md transition-all min-w-[100px] group"
           >
-            <span className="text-3xl">{category.icon ?? '📦'}</span>
+            {category.icon && (
+              <Image src={category.icon} alt={category.name} width={32} height={32} unoptimized className="w-8 h-8 object-contain" />
+            )}
             <span className="text-sm font-medium text-gray-700 group-hover:text-[#3762cc] transition-colors text-center whitespace-nowrap">
               {category.name}
             </span>

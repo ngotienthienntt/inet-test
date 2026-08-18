@@ -1,6 +1,7 @@
 'use client'
 
 import { Suspense, useState } from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { useSearchParams, usePathname } from 'next/navigation'
 import { ChevronDown, ChevronUp } from 'lucide-react'
@@ -88,7 +89,9 @@ function CategorySidebarInner({ categories, tags }: { categories: Category[]; ta
                   href={`/shop?category=${category.slug}`}
                   className="flex-1 flex items-center gap-2 px-3 py-2"
                 >
-                  {category.icon && <span>{category.icon}</span>}
+                  {category.icon && (
+                    <Image src={category.icon} alt="" width={20} height={20} unoptimized className="w-5 h-5 object-contain" />
+                  )}
                   <span>{category.name}</span>
                 </Link>
                 {category.children && category.children.length > 0 && (

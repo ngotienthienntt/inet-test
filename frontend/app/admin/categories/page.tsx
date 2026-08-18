@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { ToastContainer } from '@/components/ui/Toast'
 import { useToast } from '@/hooks/useToast'
 import ConfirmDialog from '@/components/ui/ConfirmDialog'
@@ -31,6 +31,8 @@ export default function AdminCategoriesPage() {
   const [editTarget, setEditTarget] = useState<Category | null>(null)
   const [form, setForm] = useState(EMPTY_FORM)
   const [saving, setSaving] = useState(false)
+  const [uploading, setUploading] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const [error, setError] = useState('')
   const { toasts, toast, close } = useToast()
   const [confirm, setConfirm] = useState<{ id: number; name: string } | null>(null)
@@ -57,6 +59,26 @@ export default function AdminCategoriesPage() {
     setForm({ name: cat.name, slug: cat.slug, description: cat.description || '', icon: cat.icon || '', parentId: String(cat.parentId ?? ''), isActive: cat.isActive })
     setError('')
     setShowForm(true)
+  }
+
+  async function handleUpload(files: FileList | null) {
+    if (!files || files.length === 0) return
+    setUploading(true)
+    try {
+      const fd = new FormData()
+      fd.append('file', files[0])
+      const res = await adminFetch(`${API_URL}/upload/image`, {
+        method: 'POST',
+        body: fd,
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.message || 'Upload thất bại')
+      setForm(prev => ({ ...prev, icon: data.url }))
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Upload thất bại')
+    } finally {
+      setUploading(false)
+    }
   }
 
   async function handleSave() {
@@ -126,8 +148,37 @@ export default function AdminCategoriesPage() {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Icon</label>
-              <input value={form.icon} onChange={e => setForm(p => ({ ...p, icon: e.target.value }))} placeholder="📱" maxLength={4} className="w-24 border border-gray-200 rounded-lg px-3 py-2 text-lg text-center focus:outline-none focus:ring-2 focus:ring-[#3762cc]" />
-              <p className="text-xs text-gray-400 mt-1">Dán 1 emoji, ví dụ 📱 💻 🎮</p>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/webp,image/gif"
+                className="hidden"
+                onChange={e => handleUpload(e.target.files)}
+              />
+              <div
+                onClick={() => !uploading && fileInputRef.current?.click()}
+                onDragOver={e => e.preventDefault()}
+                onDrop={e => { e.preventDefault(); if (!uploading) handleUpload(e.dataTransfer.files) }}
+                className={`relative border-2 border-dashed border-gray-200 rounded-xl p-3 text-center transition-colors ${uploading ? 'cursor-wait opacity-70' : 'cursor-pointer hover:border-[#3762cc] hover:bg-blue-50/30'}`}
+              >
+                {uploading ? (
+                  <div className="w-5 h-5 mx-auto border-2 border-[#3762cc] border-t-transparent rounded-full animate-spin" />
+                ) : form.icon ? (
+                  <div className="flex items-center justify-center gap-2">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={form.icon} alt="" className="w-10 h-10 object-contain" />
+                    <button
+                      type="button"
+                      onClick={e => { e.stopPropagation(); setForm(p => ({ ...p, icon: '' })) }}
+                      className="text-red-500 hover:underline text-xs"
+                    >
+                      Xóa
+                    </button>
+                  </div>
+                ) : (
+                  <p className="text-xs text-gray-500">Kéo thả hoặc click để chọn ảnh icon</p>
+                )}
+              </div>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Slug</label>
@@ -156,7 +207,7 @@ export default function AdminCategoriesPage() {
             </div>
             {error && <p className="text-sm text-red-600 bg-red-50 rounded-lg px-3 py-2">{error}</p>}
             <div className="flex gap-3 pt-2">
-              <button onClick={handleSave} disabled={saving || !form.name} className="flex-1 py-2.5 bg-[#3762cc] text-white rounded-lg font-semibold text-sm hover:bg-[#2a4fa3] disabled:opacity-60">
+              <button onClick={handleSave} disabled={saving || uploading || !form.name} className="flex-1 py-2.5 bg-[#3762cc] text-white rounded-lg font-semibold text-sm hover:bg-[#2a4fa3] disabled:opacity-60">
                 {saving ? 'Đang lưu...' : 'Lưu'}
               </button>
               <button onClick={() => setShowForm(false)} className="flex-1 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50">Hủy</button>
@@ -176,7 +227,10 @@ export default function AdminCategoriesPage() {
               <div key={cat.id} className="flex items-center justify-between px-6 py-4 hover:bg-gray-50">
                 <div className="flex items-center gap-3" style={{ paddingLeft: level * 24 }}>
                   {level > 0 && <span className="text-gray-300 text-sm">└</span>}
-                  {cat.icon && <span className="text-lg">{cat.icon}</span>}
+                  {cat.icon && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={cat.icon} alt="" className="w-6 h-6 object-contain" />
+                  )}
                   <div>
                     <div className="font-medium text-gray-900">{cat.name}</div>
                     <div className="text-xs text-gray-400 font-mono">{cat.slug}</div>
