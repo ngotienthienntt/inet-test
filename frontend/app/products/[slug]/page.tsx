@@ -2,8 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import type { Product, ProductDetail, ProductVariant } from '@/lib/types'
 import ImageGallery from '@/components/product/ImageGallery'
-import VariantSelector from '@/components/product/VariantSelector'
-import AddToCartSection from '@/components/product/AddToCartSection'
+import ProductPurchasePanel from '@/components/product/ProductPurchasePanel'
 import ProductTabs from '@/components/product/ProductTabs'
 import ProductCard from '@/components/shop/ProductCard'
 
@@ -89,14 +88,6 @@ function mapApiToProductDetail(p: ApiProduct): ProductDetail {
   }
 }
 
-function formatVND(amount: number): string {
-  return amount.toLocaleString('vi-VN') + ' ₫'
-}
-
-function calcDiscount(price: number, originalPrice: number): number {
-  return Math.round(((originalPrice - price) / originalPrice) * 100)
-}
-
 async function fetchProductBySlug(slug: string): Promise<{
   detail: ProductDetail | null
   related: Product[]
@@ -175,8 +166,6 @@ export default async function ProductDetailPage({ params }: Props) {
     )
   }
 
-  const discount = calcDiscount(detail.price, detail.originalPrice)
-
   return (
     <main className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 py-8">
@@ -228,38 +217,11 @@ export default async function ProductDetailPage({ params }: Props) {
               <span className="text-sm text-gray-400">({detail.reviewCount} đánh giá)</span>
             </div>
 
-            {/* Price */}
-            <div className="flex items-end gap-3">
-              <span className="text-3xl font-bold text-[#f5821f]">
-                {formatVND(detail.price)}
-              </span>
-              {discount > 0 && (
-                <>
-                  <span className="text-lg text-gray-400 line-through mb-0.5">
-                    {formatVND(detail.originalPrice)}
-                  </span>
-                  <span className="px-2 py-1 bg-red-100 text-red-600 text-sm font-bold rounded-lg mb-0.5">
-                    -{discount}%
-                  </span>
-                </>
-              )}
-            </div>
-
-            {/* Variant selector */}
-            {(() => {
-              const sizes = [...new Set(detail.variants.map(v => v.size).filter(Boolean))] as string[]
-              const colorMap = new Map<string, string>()
-              for (const v of detail.variants) {
-                if (v.colorName && v.colorHex) colorMap.set(v.colorName, v.colorHex)
-              }
-              const colors = [...colorMap.entries()].map(([name, hex]) => ({ name, hex }))
-              return (sizes.length > 0 || colors.length > 0) ? (
-                <VariantSelector sizes={sizes} colors={colors} />
-              ) : null
-            })()}
-
-            {/* Add to cart */}
-            <AddToCartSection product={detail} variantId={detail.variants[0]?.id} />
+            {/* Price, variant selector, add-to-cart — one client component so
+                switching size/color updates the price and the variant that
+                actually gets added to cart, instead of always using the
+                first/cheapest variant regardless of selection. */}
+            <ProductPurchasePanel detail={detail} />
 
             {/* Short description */}
             {detail.description && (
