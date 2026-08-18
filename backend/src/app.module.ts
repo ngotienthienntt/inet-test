@@ -31,10 +31,10 @@ import { SettingsModule } from './settings/settings.module';
       validationOptions: { abortEarly: false },
     }),
 
-    // Rate limiting: global short (3 req/sec) and medium (100 req/min) throttle windows
+    // Rate limiting: global short (100 req/sec) and medium (1000 req/min) throttle windows
     ThrottlerModule.forRoot([
-      { name: 'short', ttl: 1000, limit: 3 },
-      { name: 'medium', ttl: 60000, limit: 100 },
+      { name: 'short', ttl: 1000, limit: 100 },
+      { name: 'medium', ttl: 60000, limit: 1000 },
     ]),
 
     // Connect to PostgreSQL using values from ConfigService (never hardcode credentials)

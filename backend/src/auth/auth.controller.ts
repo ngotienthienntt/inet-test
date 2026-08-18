@@ -22,7 +22,7 @@ function sanitizeUser(user: User): SanitizedUser {
 }
 
 @ApiTags('Auth')
-@Throttle({ short: { ttl: 60000, limit: 5 }, medium: { ttl: 3600000, limit: 20 } })
+@Throttle({ short: { ttl: 60000, limit: 15 }, medium: { ttl: 3600000, limit: 60 } })
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
