@@ -50,8 +50,13 @@ function getImage(product: Product): string {
 // Multiple variants can carry different prices (size, color, ...) — listings
 // show the cheapest one, matching common "from ₫X" e-commerce convention.
 function getPrice(product: Product): { price: number; originalPrice: number; variantId: number | undefined } {
-  const v = product.variants?.reduce((min, c) => (c.price < min.price ? c : min), product.variants[0])
-  return { price: v?.price ?? 0, originalPrice: v?.originalPrice ?? 0, variantId: v?.id }
+  // Prices come back from Postgres as numeric strings — cast before comparing
+  // or the "cheapest" pick and the displayed value are both wrong.
+  const v = product.variants?.reduce(
+    (min, c) => (Number(c.price) < Number(min.price) ? c : min),
+    product.variants[0],
+  )
+  return { price: Number(v?.price ?? 0), originalPrice: Number(v?.originalPrice ?? 0), variantId: v?.id }
 }
 
 export default async function FeaturedProducts() {
