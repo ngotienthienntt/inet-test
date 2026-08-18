@@ -8,6 +8,11 @@ import { AppModule } from './app.module';
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
+  // Trust the reverse proxy (Nginx) so req.ip reflects the real client IP
+  // from X-Forwarded-For instead of the proxy's own address. Without this,
+  // rate limiting (ThrottlerGuard) buckets every client together.
+  app.set('trust proxy', 1);
+
   // Serve uploaded files as static assets at /uploads/*
   app.useStaticAssets(join(process.cwd(), 'uploads'), { prefix: '/uploads' });
 
