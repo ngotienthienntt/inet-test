@@ -12,12 +12,13 @@ interface Category {
   name: string
   slug: string
   description?: string
+  icon?: string
   isActive: boolean
   children?: Category[]
   parentId?: number | null
 }
 
-const EMPTY_FORM = { name: '', slug: '', description: '', parentId: '', isActive: true }
+const EMPTY_FORM = { name: '', slug: '', description: '', icon: '', parentId: '', isActive: true }
 
 function slugify(str: string) {
   return str.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9\s-]/g, '').trim().replace(/\s+/g, '-')
@@ -53,7 +54,7 @@ export default function AdminCategoriesPage() {
 
   function openEdit(cat: Category) {
     setEditTarget(cat)
-    setForm({ name: cat.name, slug: cat.slug, description: cat.description || '', parentId: String(cat.parentId ?? ''), isActive: cat.isActive })
+    setForm({ name: cat.name, slug: cat.slug, description: cat.description || '', icon: cat.icon || '', parentId: String(cat.parentId ?? ''), isActive: cat.isActive })
     setError('')
     setShowForm(true)
   }
@@ -62,7 +63,7 @@ export default function AdminCategoriesPage() {
     setError('')
     setSaving(true)
     try {
-      const body = { name: form.name, slug: form.slug, description: form.description || undefined, parentId: form.parentId ? Number(form.parentId) : null, isActive: form.isActive }
+      const body = { name: form.name, slug: form.slug, description: form.description || undefined, icon: form.icon || undefined, parentId: form.parentId ? Number(form.parentId) : null, isActive: form.isActive }
       const url = editTarget ? `${API_URL}/categories/${editTarget.id}` : `${API_URL}/categories`
       const method = editTarget ? 'PATCH' : 'POST'
       const res = await adminFetch(url, {
@@ -124,6 +125,11 @@ export default function AdminCategoriesPage() {
               <input value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value, slug: slugify(e.target.value) }))} required className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#3762cc]" />
             </div>
             <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Icon</label>
+              <input value={form.icon} onChange={e => setForm(p => ({ ...p, icon: e.target.value }))} placeholder="📱" maxLength={4} className="w-24 border border-gray-200 rounded-lg px-3 py-2 text-lg text-center focus:outline-none focus:ring-2 focus:ring-[#3762cc]" />
+              <p className="text-xs text-gray-400 mt-1">Dán 1 emoji, ví dụ 📱 💻 🎮</p>
+            </div>
+            <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Slug</label>
               <input value={form.slug} onChange={e => setForm(p => ({ ...p, slug: e.target.value }))} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-[#3762cc]" />
             </div>
@@ -170,6 +176,7 @@ export default function AdminCategoriesPage() {
               <div key={cat.id} className="flex items-center justify-between px-6 py-4 hover:bg-gray-50">
                 <div className="flex items-center gap-3" style={{ paddingLeft: level * 24 }}>
                   {level > 0 && <span className="text-gray-300 text-sm">└</span>}
+                  {cat.icon && <span className="text-lg">{cat.icon}</span>}
                   <div>
                     <div className="font-medium text-gray-900">{cat.name}</div>
                     <div className="text-xs text-gray-400 font-mono">{cat.slug}</div>
