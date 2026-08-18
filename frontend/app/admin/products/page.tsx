@@ -22,9 +22,16 @@ interface Product {
 
 function formatVND(n: number) { return n.toLocaleString('vi-VN') + ' ₫' }
 
+// Multiple variants can carry different prices (size, color, ...) — the list
+// shows the cheapest one, matching the customer-facing listing pages.
+function cheapestVariant(variants: Record<string, unknown>[]): Record<string, unknown> | undefined {
+  if (variants.length === 0) return undefined
+  return variants.reduce((min, v) => (Number(v.price) < Number(min.price) ? v : min), variants[0])
+}
+
 function mapProduct(item: unknown): Product {
   const p = item as Record<string, unknown>
-  const variant = (Array.isArray(p.variants) ? p.variants[0] : undefined) as Record<string, unknown> | undefined
+  const variant = Array.isArray(p.variants) ? cheapestVariant(p.variants as Record<string, unknown>[]) : undefined
   const cat = p.category as Record<string, unknown> | string | undefined
   const images = Array.isArray(p.images)
     ? (p.images as Record<string, unknown>[]).map(img => typeof img === 'string' ? img : String(img.url ?? ''))
