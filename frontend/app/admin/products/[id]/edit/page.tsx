@@ -218,6 +218,7 @@ export default function EditProductPage() {
                 placeholder="0"
                 className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#3762cc]"
               />
+              <p className="text-xs text-gray-400 mt-1">Chỉ áp dụng cho biến thể chưa nhập giá riêng — không ghi đè biến thể đã có giá</p>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Giá gốc</label>
