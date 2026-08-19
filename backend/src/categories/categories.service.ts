@@ -1,6 +1,6 @@
 import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { IsNull, Repository } from 'typeorm';
 import { Category } from './entities/category.entity';
 import { Product } from '../products/entities/product.entity';
 import { CreateCategoryDto } from './dto/create-category.dto';
@@ -16,7 +16,11 @@ export class CategoriesService {
   ) {}
 
   async findAll(includeInactive = false): Promise<Category[]> {
-    const where: Record<string, unknown> = { parentId: null as any };
+    // IsNull() is required here — a raw `null` value in TypeORM's
+    // FindOptionsWhere is silently dropped (no WHERE clause is generated
+    // at all), which previously returned every category as a false
+    // top-level "parent" in addition to its real nesting under children.
+    const where: Record<string, unknown> = { parentId: IsNull() };
     if (!includeInactive) where.isActive = true;
 
     const parents = await this.categoryRepo.find({
